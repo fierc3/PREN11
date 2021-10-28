@@ -1,8 +1,10 @@
 const net = require('net');
 
 var port = 6969
+var host = "pren11backendconcept.azurewebsites.net"
+//var host = "localhost"
 
-const client = net.createConnection({ port: port }, () => {
+const client = net.createConnection({ port:port, host: host}, () => {
   console.log('CLIENT: I connected to the server.');
   client.write('CLIENT: Hello this is client!');
 });

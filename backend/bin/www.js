@@ -13,9 +13,6 @@ var httpServer = http.createServer(app);
 startHttpServer();
 startRobotSocketServer();
 
-
-
-
 function startHttpServer() {
 
   console.log("Starting HTTP Server")
@@ -42,11 +39,7 @@ function startRobotSocketServer() {
   socket.listen(port, () => {
     console.log(`Started Socket on ${port}`)
   })
-
 }
-
-
-
 
 function normalizePort(val) {
   var port = parseInt(val, 10);
