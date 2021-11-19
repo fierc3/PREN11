@@ -1,8 +1,8 @@
 const net = require('net');
 
 var port = 6969
-var host = "pren11backendconcept.azurewebsites.net"
-//var host = "localhost"
+//var host = "pren11backendconcept.azurewebsites.net"
+var host = "localhost"
 
 const client = net.createConnection({ port:port, host: host}, () => {
   console.log('CLIENT: I connected to the server.');
@@ -12,6 +12,9 @@ client.on('data', (data) => {
   console.log(data.toString());
   client.end();
 });
+client.on('error',(error) =>{
+  console.log(error);
+}  )
 client.on('end', () => {
   console.log('CLIENT: I disconnected from the server.');
 });

@@ -7,54 +7,67 @@
 var app = require('../app');
 var debug = require('debug')('backend:server');
 var http = require('http');
-const net = require('net');
+const socketIo = require("socket.io");
 
 var httpServer = http.createServer(app);
 startHttpServer();
-startRobotSocketServer();
+
+//sockets
+const io = socketIo(httpServer,{
+  cors: {
+    origin: "http://localhost:3001",
+    methods: ["GET", "POST"]
+  }
+})
+let interval;
+
+io.on("connection", (socket) => {
+  console.log("New client connected");
+  if (interval) {
+    clearInterval(interval);
+  }
+  interval = setInterval(() => getApiAndEmit(socket), 1000);
+  socket.on("disconnect", () => {
+    console.log("Client disconnected");
+    clearInterval(interval);
+  });
+});
+
+const getApiAndEmit = socket => {
+  const response = new Date();
+  console.log(response.getTime())
+  // Emitting a new message. Will be consumed by the client
+  socket.emit("FromAPI", response);
+};
+
+//httpServer.listen(port, () => console.log(`Listening on port ${port}`));
+
+
+function normalizePort(val) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+      // named pipe
+      return val;
+  }
+
+  if (port >= 0) {
+      // port number
+      return port;
+  }
+
+  return false;
+}
+
 
 function startHttpServer() {
 
-  console.log("Starting HTTP Server")
   var port = normalizePort(process.env.PORT || '3000');
   app.set('port', port);
   httpServer.listen(port);
   httpServer.on('error', onError);
   httpServer.on('listening', onListening);
   console.log(`Started HTTP on ${port}`)
-}
-
-function startRobotSocketServer() {
-  console.log("Starting Socket Server")
-  var port = 6969
-
-  const socket = net.createServer((socket) => {
-    socket.on('data', (data) => {
-      console.log(data.toString());
-    })
-  }).on('error', (err) => {
-    console.error(err);
-  });
-
-  socket.listen(port, () => {
-    console.log(`Started Socket on ${port}`)
-  })
-}
-
-function normalizePort(val) {
-  var port = parseInt(val, 10);
-
-  if (isNaN(port)) {
-    // named pipe
-    return val;
-  }
-
-  if (port >= 0) {
-    // port number
-    return port;
-  }
-
-  return false;
 }
 
 /**
