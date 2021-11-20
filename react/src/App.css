@@ -49,6 +49,7 @@
   display: flex; 
   flex-direction: column 
 
+
 }
 
 .unknown{
@@ -63,4 +64,54 @@
 .healthy{
   color:greenyellow;
   font-weight: bold;
+}
+
+.unselectable {
+  -moz-user-select: -moz-none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+
+.inbackground{
+  position: absolute;
+  height: calc(100vh + 1.5em);
+  width: 100vw;
+  color: #03A062;
+  align-items: center;
+}
+
+.m-letter{
+  font-size: 0.7em;
+  margin: 0;
+  text-shadow: 0 0 10px green, 0 0 20px #fff, 0 0 30px #03A062, 0 0 40px green, 0 0 50px green, 0 0 60px #03A062, 0 0 70px green;
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+}
+
+/* The animation code */
+@keyframes moveanim {
+  from {margin-top: -500px;height: 100vh; opacity: 100;}
+  to {margin-top: 100vh;height: 0;  opacity: 0;}
+}
+
+.mover{
+  opacity: 0;
+  position: fixed;
+  max-height: 100vh;
+  animation-name: moveanim;
+  animation-duration: 20s;
+  animation-timing-function: steps(40);
+  width: 100vw;
+}
+
+.matrix-container{
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  flex-direction: row;
+}
+
+.matrix-col{
+  flex-grow: 1;
 }
