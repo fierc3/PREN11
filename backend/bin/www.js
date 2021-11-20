@@ -40,8 +40,6 @@ const getApiAndEmit = socket => {
   socket.emit("FromAPI", response);
 };
 
-//httpServer.listen(port, () => console.log(`Listening on port ${port}`));
-
 
 function normalizePort(val) {
   var port = parseInt(val, 10);

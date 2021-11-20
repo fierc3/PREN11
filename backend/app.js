@@ -40,10 +40,3 @@ app.use(function(err, req, res, next) {
 
 
 module.exports = app;
-
-
-
-//console.log(socket)
-
-//socket.startRobotSocketServer();
-//socket.startHttpServer();
