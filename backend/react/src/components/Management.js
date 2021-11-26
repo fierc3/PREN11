@@ -22,7 +22,7 @@ const Management = () => {
 
 
   const connect = () => {
-    const socket = getMainSocket(ENDPOINT)
+    let socket = getMainSocket(ENDPOINT)
     socket.on("FromAPI", data => {
 
       const timeData = data.split(";")[0]
@@ -49,7 +49,17 @@ const Management = () => {
       setResponse(remoteMs + "");
       setLocalTime(currTime + "");
     });
+
+    socket.on("RobotOutput", data => {
+      console.log("Received Robot Output", data);
+    })
   }
+
+  const sendMessageAsRobot = (msg) => {
+    let socket = getMainSocket(ENDPOINT);
+    socket.emit('robot', msg);
+  }
+
 
   useEffect(() => {
     connect();
@@ -176,6 +186,7 @@ const Management = () => {
       description: 'Force to create new connection',
       fn: (...args) => {
         return new Promise((resolve, reject) => {
+          setHistory([...history, "forceconnect"])
           connect();
           resolve();
         })
@@ -185,6 +196,7 @@ const Management = () => {
       description: 'Set New Port',
       fn: (...args) => {
         return new Promise((resolve, reject) => {
+          setHistory([...history, "setport"])
           var port = args[0]
           ENDPOINT = "http://localhost:" + port;
           resolve("Updated port to " + port);
@@ -195,6 +207,7 @@ const Management = () => {
       description: 'Set New Endpoint (https://xxx:xx)',
       fn: (...args) => {
         return new Promise((resolve, reject) => {
+          setHistory([...history, "setendpoint"])
           ENDPOINT = args[0]
           resolve("Updated endpoint to " + ENDPOINT);
         })
@@ -204,6 +217,7 @@ const Management = () => {
       description: 'Display Endpoint',
       fn: (...args) => {
         return new Promise((resolve, reject) => {
+          setHistory([...history, "endpoint"])
           resolve("Current " + ENDPOINT);
         })
       }
@@ -212,8 +226,27 @@ const Management = () => {
       description: 'Disconnects main socket',
       fn: (...args) => {
         return new Promise((resolve, reject) => {
+          setHistory([...history, "disconnectmain"])
           disconnectMain();
           resolve("Disconnected main socket, use forceconnect to reconned ");
+        })
+      }
+    },
+    sendRoboMsg: {
+      description: 'Send msg disguised as robot',
+      fn: (...args) => {
+        return new Promise((resolve, reject) => {
+          console.log(args)
+          if(args.length !== 2){
+            resolve("Needs 2 arguements");
+            return
+          }
+          if(args[0] === 'hellofriend'){
+            sendMessageAsRobot(args[1])
+            resolve("Done");
+            return
+          }
+
         })
       }
     }
