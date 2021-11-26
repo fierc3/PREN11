@@ -16,7 +16,7 @@ const Management = () => {
   const matrix = Array.apply(null, Array(100))
   var charSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890+>?-$#@%&*';
   const [matrixMode, setMatrixMode] = useState(false);
-  const [diffs, setDiffs] = useState([0]);
+  const [diffs, setDiffs] = useState([]);
 
 const connect = () => {
   const socket = socketIOClient(ENDPOINT);
@@ -24,13 +24,18 @@ const connect = () => {
     const currTime = new Date().getTime();
     const remoteMs = Date.parse(data);
 
+    //calculate differents between remote and local
     const diff = currTime - remoteMs;
-
+    if(diff < 0){
+      return;
+    }
     setDiffTime(diff);
     if(diffs > 100){
       (diffs.splice(1, 100))
     }
-    setDiffs([...diffs, diff])
+    if(diff>=0){
+      setDiffs([...diffs, diff])
+    }
     setResponse(remoteMs + "");
     setLocalTime(currTime + "");
   });
@@ -54,6 +59,12 @@ const connect = () => {
     resultMatrix = array;
     })
     return resultMatrix;
+  }
+
+  const calcAverage = (numbers) => {
+    const sum = numbers.reduce((a, b) => a + b, 0);
+    const avg = (sum / numbers.length) || 0;
+    return avg;
   }
 
   const healthCheck = ()  => {
@@ -217,7 +228,7 @@ const connect = () => {
         <p>
           Time  on Localhost &emsp; {localTime}
         </p>
-        <h2>Difference: <span>{diffTime}ms</span> // Average: {(diffs.reduce((a,b) => a+b,0) / diffs.length) || 0}ms
+        <h2>Difference: <span>{diffTime}ms</span> // Average: {calcAverage(diffs)}ms
         </h2>
       </div>
       <div className="console" style={{ height: "50%%", flexGrow: "1", display: "flex", flexDirection: "column" , zIndex:100, background:"none"}}>
