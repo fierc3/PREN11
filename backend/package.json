@@ -15,6 +15,7 @@
     "morgan": "~1.9.1",
     "npm-watch": "^0.11.0",
     "pug": "2.0.0-beta11",
+    "react-router-dom": "^6.0.2",
     "socket.io": "^4.4.0"
   },
   "watch": {

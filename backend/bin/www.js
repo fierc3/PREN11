@@ -15,8 +15,7 @@ startHttpServer();
 //sockets
 const io = socketIo(httpServer,{
   cors: {
-    origin: "http://localhost:3001",
-    methods: ["GET", "POST"]
+    origin: '*',
   }
 })
 let interval;
@@ -60,7 +59,7 @@ function normalizePort(val) {
 
 function startHttpServer() {
 
-  var port = normalizePort(process.env.PORT || '3000');
+  var port = normalizePort(process.env.PORT || '3001');
   app.set('port', port);
   httpServer.listen(port);
   httpServer.on('error', onError);
