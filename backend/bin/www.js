@@ -33,10 +33,10 @@ io.on("connection", (socket) => {
 });
 
 const getApiAndEmit = socket => {
+  var clientCount = io.engine.clientsCount;
   const response = new Date();
-  console.log(response.getTime())
   // Emitting a new message. Will be consumed by the client
-  socket.emit("FromAPI", response);
+  socket.emit("FromAPI", response + ";" + clientCount);
 };
 
 

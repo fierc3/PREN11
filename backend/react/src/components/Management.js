@@ -8,6 +8,7 @@ var ENDPOINT = config.url.API_URL;
 const Management = () => {
   const [response, setResponse] = useState("NOTYETLOADED")
   const [localTime, setLocalTime] = useState("NOTYETLOADED")
+  const [activeCons, setActiveCons] = useState(-1)
   const [diffTime, setDiffTime] = useState(0)
   const [history, setHistory] = useState([
     "History: "
@@ -21,8 +22,15 @@ const Management = () => {
 const connect = () => {
   const socket = socketIOClient(ENDPOINT);
   socket.on("FromAPI", data => {
+
+    const timeData = data.split(";")[0]
+    const activeConData = data.split(";")[1]
+
+    //active connections
+    setActiveCons(activeConData)
+
     const currTime = new Date().getTime();
-    const remoteMs = Date.parse(data);
+    const remoteMs = Date.parse(timeData);
 
     //calculate differents between remote and local
     const diff = currTime - remoteMs;
@@ -222,14 +230,21 @@ const connect = () => {
       <h1>PREN 11</h1>
       <div className="live-data" style={{ borderBottom: "3px solid green" }} >
         <h3>Analytics (HEALTH CHECK: <span className={`health-result ${health.toLowerCase()}`}>{health}</span>)</h3>
-        <p>
-          Time on Remote &emsp; {response}
-        </p>
-        <p>
-          Time  on Localhost &emsp; {localTime}
-        </p>
-        <h2>Difference: <span>{diffTime}ms</span> // Average: {calcAverage(diffs)}ms
-        </h2>
+        <div style={{ display: 'flex', flexDirection: 'row', width: '100v'}}>
+          <div style={{flexGrow:1}}>
+            <p>
+              Time on Remote &emsp; {response}
+            </p>
+            <p>
+              Time  on Localhost &emsp; {localTime}
+            </p>
+            <h2>Difference: <span>{diffTime}ms</span> // Average: {calcAverage(diffs)}ms
+            </h2>
+          </div>
+          <div style={{flexGrow:1, float:'right', textAlign:'end', marginRight:'2em'}}>
+            <p>active connections: {activeCons}</p>
+          </div>
+        </div>
       </div>
       <div className="console" style={{ height: "50%%", flexGrow: "1", display: "flex", flexDirection: "column" , zIndex:100, background:"none"}}>
         <ReactConsole
