@@ -10,14 +10,14 @@ const Management = () => {
   const [localTime, setLocalTime] = useState("NOTYETLOADED")
   const [activeCons, setActiveCons] = useState(-1)
   const [diffTime, setDiffTime] = useState(0)
-  const [history, setHistory] = useState([
-    "History: "
-  ])
   const [health, setHealth] = useState("UNKNOWN");
   const matrix = Array.apply(null, Array(100))
   var charSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890+>?-$#@%&*';
   const [matrixMode, setMatrixMode] = useState(false);
   const [diffs, setDiffs] = useState([]);
+  const [robotMessages, setRobotMessages] = useState([
+    "Robot Messages will be displayed here"
+  ])
 
 
 
@@ -50,8 +50,8 @@ const Management = () => {
       setLocalTime(currTime + "");
     });
 
-    socket.on("RobotOutput", data => {
-      console.log("Received Robot Output", data);
+    socket.on("RobotOutput", roboMessage => {
+      setRobotMessages(arr => [...arr, roboMessage])
     })
   }
 
@@ -108,12 +108,6 @@ const Management = () => {
 
 
   const customCommands = {
-    history: {
-      description: 'History',
-      fn: () => new Promise(resolve => {
-        resolve(`${history.join('\r\n')}`)
-      })
-    },
     echo: {
       description: 'Echo',
       fn: (...args) => {
@@ -139,7 +133,6 @@ const Management = () => {
       fn: (...args) => {
         return new Promise((resolve, reject) => {
           setTimeout(() => {
-            setHistory([...history, "health"])
             resolve(healthCheck())
           }, 1000)
         })
@@ -150,7 +143,6 @@ const Management = () => {
       fn: (...args) => {
         return new Promise((resolve, reject) => {
           setTimeout(() => {
-            setHistory([...history, "rickroll"])
             window.open("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
             resolve("hihihihi");
           }, 1000)
@@ -162,7 +154,6 @@ const Management = () => {
       fn: (...args) => {
         return new Promise((resolve, reject) => {
           setTimeout(() => {
-            setHistory([...history, "help"])
             var res = Object.entries(customCommands).map((key, value) => key[0] + " - " + key[1].description + "\n")
             resolve(res.join(""));
           }, 1000)
@@ -175,7 +166,6 @@ const Management = () => {
         return new Promise((resolve, reject) => {
           setMatrixMode(true)
           setTimeout(() => {
-            setHistory([...history, "matrix"])
             setMatrixMode(false)
             resolve("Hello Neo")
           }, 15000)
@@ -186,7 +176,6 @@ const Management = () => {
       description: 'Force to create new connection',
       fn: (...args) => {
         return new Promise((resolve, reject) => {
-          setHistory([...history, "forceconnect"])
           connect();
           resolve();
         })
@@ -196,7 +185,6 @@ const Management = () => {
       description: 'Set New Port',
       fn: (...args) => {
         return new Promise((resolve, reject) => {
-          setHistory([...history, "setport"])
           var port = args[0]
           ENDPOINT = "http://localhost:" + port;
           resolve("Updated port to " + port);
@@ -207,7 +195,6 @@ const Management = () => {
       description: 'Set New Endpoint (https://xxx:xx)',
       fn: (...args) => {
         return new Promise((resolve, reject) => {
-          setHistory([...history, "setendpoint"])
           ENDPOINT = args[0]
           resolve("Updated endpoint to " + ENDPOINT);
         })
@@ -217,7 +204,6 @@ const Management = () => {
       description: 'Display Endpoint',
       fn: (...args) => {
         return new Promise((resolve, reject) => {
-          setHistory([...history, "endpoint"])
           resolve("Current " + ENDPOINT);
         })
       }
@@ -226,7 +212,6 @@ const Management = () => {
       description: 'Disconnects main socket',
       fn: (...args) => {
         return new Promise((resolve, reject) => {
-          setHistory([...history, "disconnectmain"])
           disconnectMain();
           resolve("Disconnected main socket, use forceconnect to reconned ");
         })
@@ -274,7 +259,7 @@ const Management = () => {
       <h1>PREN 11</h1>
       <div className="live-data" style={{ borderBottom: "3px solid green" }} >
         <h3>Analytics (HEALTH CHECK: <span className={`health-result ${health.toLowerCase()}`}>{health}</span>)</h3>
-        <div style={{ display: 'flex', flexDirection: 'row', width: '100v' }}>
+        <div style={{ display: 'flex', flexDirection: 'row', width: '100v', height:'30vh' }}>
           <div style={{ flexGrow: 1 }}>
             <p>
               Time on Remote &emsp; {response}
@@ -285,8 +270,13 @@ const Management = () => {
             <h2>Difference: <span>{diffTime}ms</span> // Average: {calcAverage(diffs)}ms
             </h2>
           </div>
-          <div style={{ flexGrow: 1, float: 'right', textAlign: 'end', marginRight: '2em' }}>
-            <p>active connections: {activeCons}</p>
+          <div style={{ flexGrow: 1, textAlign: 'end',  height:'100%', paddingRight: '3em',}}>
+          <p>active connections: {activeCons}</p>
+          <div style={{float: 'right', paddingRight: '10px', overflow:'auto', height:'100%'}}>
+            {robotMessages.map(x => {
+              return(<p> {x} </p>)
+            })}
+            </div>
           </div>
         </div>
       </div>
