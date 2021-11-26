@@ -26,11 +26,16 @@ io.on("connection", (socket) => {
     clearInterval(interval);
   }
   interval = setInterval(() => getApiAndEmit(socket), 1000);
+  socket.on("robot", (msg) => {
+    console.log(`Robot sent message ${msg}`);
+    emitRobotMessage(socket, msg)
+  });
   socket.on("disconnect", () => {
     console.log("Client disconnected");
     clearInterval(interval);
   });
 });
+
 
 const getApiAndEmit = socket => {
   var clientCount = io.engine.clientsCount;
@@ -38,6 +43,10 @@ const getApiAndEmit = socket => {
   // Emitting a new message. Will be consumed by the client
   socket.emit("FromAPI", response + ";" + clientCount);
 };
+
+const emitRobotMessage = (socket, msg) => {
+  socket.emit("RobotOutput", msg );
+}
 
 
 function normalizePort(val) {
