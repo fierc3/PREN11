@@ -42,7 +42,7 @@ const connect = () => {
       (diffs.splice(1, 100))
     }
     if(diff>=0){
-      setDiffs([...diffs, diff])
+      setDiffs( arr => [...arr, diff]);
     }
     setResponse(remoteMs + "");
     setLocalTime(currTime + "");
