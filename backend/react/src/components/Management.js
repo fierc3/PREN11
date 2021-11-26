@@ -1,10 +1,11 @@
-import './App.css';
+import '../App.css';
 import React, { useState, useEffect } from "react";
 import socketIOClient from "socket.io-client";
 import ReactConsole from '@webscopeio/react-console';
-const ENDPOINT = "http://localhost:3000";
+import { config } from '../Constants'
+var ENDPOINT = config.url.API_URL;
 
-const App = () => {
+const Management = () => {
   const [response, setResponse] = useState("NOTYETLOADED")
   const [localTime, setLocalTime] = useState("NOTYETLOADED")
   const [diffTime, setDiffTime] = useState(0)
@@ -158,6 +159,33 @@ const connect = () => {
           resolve();
       })
     }
+  },
+  setport: {
+    description: 'Set New Port',
+    fn: (...args) => {
+      return new Promise((resolve, reject) => {
+         var port = args[0]
+         ENDPOINT = "http://localhost:"+port;
+         resolve("Updated port to " + port);
+      })
+    }
+  },
+  setendpoint: {
+    description: 'Set New Endpoint (https://xxx:xx)',
+    fn: (...args) => {
+      return new Promise((resolve, reject) => {
+         ENDPOINT = args[0] 
+         resolve("Updated endpoint to " + ENDPOINT);
+      })
+    }
+  },
+  endpoint: {
+    description: 'read Endpoint',
+    fn: (...args) => {
+      return new Promise((resolve, reject) => {
+         resolve("Current " + ENDPOINT);
+      })
+    }
   }
   }
 
@@ -206,4 +234,4 @@ const connect = () => {
   );
 }
 
-export default App;
+export default Management;
