@@ -9,6 +9,7 @@ var debug = require('debug')('backend:server');
 var http = require('http');
 const socketIo = require("socket.io");
 
+
 var httpServer = http.createServer(app);
 startHttpServer();
 
@@ -16,7 +17,8 @@ startHttpServer();
 const io = socketIo(httpServer,{
   cors: {
     origin: '*',
-  }
+  },
+  allowEIO3: true 
 })
 let interval;
 
