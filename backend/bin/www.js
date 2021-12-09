@@ -27,10 +27,14 @@ io.on("connection", (socket) => {
   if (interval) {
     clearInterval(interval);
   }
-  interval = setInterval(() => getApiAndEmit(socket), 1000);
+  interval =
+    setInterval(() => {
+      emitTime(socket);
+      emitClientCount(socket);
+    }, 1000);
   socket.on("robot", (msg) => {
     console.log(`Robot sent message ${msg}`);
-    emitRobotMessage(socket, msg)
+    emitRobotMessage(socket, msg + "|"+ new Date().getTime())
   });
   socket.on("disconnect", () => {
     console.log("Client disconnected");
@@ -39,15 +43,20 @@ io.on("connection", (socket) => {
 });
 
 
-const getApiAndEmit = socket => {
+const emitTime = socket => {
   var clientCount = io.engine.clientsCount;
-  const response = new Date();
   // Emitting a new message. Will be consumed by the client
-  socket.emit("FromAPI", response + ";" + clientCount);
+  socket.emit("Time", new Date());
+};
+const emitClientCount = socket => {
+  var clientCount = io.engine.clientsCount;
+  // Emitting a new message. Will be consumed by the client
+  socket.emit("ClientCount",clientCount);
 };
 
 const emitRobotMessage = (socket, msg) => {
-  socket.emit("RobotOutput", msg );
+  console.log(`Emitting broadcast: ${msg}`);
+  io.emit("RobotOutput", msg );
 }
 
 

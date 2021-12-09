@@ -23,14 +23,8 @@ const Management = () => {
 
   const connect = () => {
     let socket = getMainSocket(ENDPOINT)
-    socket.on("FromAPI", data => {
-
-      const timeData = data.split(";")[0]
-      const activeConData = data.split(";")[1]
-
-      //active connections
-      setActiveCons(activeConData)
-
+    socket.on("Time", data => {
+      const timeData = data;
       const currTime = new Date().getTime();
       const remoteMs = Date.parse(timeData);
 
@@ -50,14 +44,22 @@ const Management = () => {
       setLocalTime(currTime + "");
     });
 
+    socket.on("ClientCount", data => {
+      const activeConData = data;
+      //active connections
+      setActiveCons(activeConData)
+    });
+
+
     socket.on("RobotOutput", roboMessage => {
-      setRobotMessages(arr => [...arr, roboMessage])
+      console.log("Received on Robotoutput " + roboMessage);
+      setRobotMessages(arr => [...arr, roboMessage + "|" + new Date().getTime()])
     })
   }
 
   const sendMessageAsRobot = (msg) => {
     let socket = getMainSocket(ENDPOINT);
-    socket.emit('robot', msg);
+    socket.emit('robot', msg + " | " + new Date().getTime());
   }
 
 
