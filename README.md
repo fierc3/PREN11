@@ -23,9 +23,6 @@ For testing purposes the sending socket for the server doesn't require authentic
             client.ExceptionOccurred += (sender, args) => Console.WriteLine($"ExceptionOccurred: {args.Value}");
             await client.ConnectAsync(new Uri("https://tactile-rigging-333212.oa.r.appspot.com"));
             await client.Emit("robot", "This was sent via c#");
-            await Task.Delay(TimeSpan.FromMilliseconds(200));
-            await Task.Delay(TimeSpan.FromMilliseconds(200));
-            await Task.Delay(TimeSpan.FromMilliseconds(200));
             await client.DisconnectAsync();
 
 
