@@ -7,7 +7,7 @@ export const getMainSocket = (ENDPOINT) => {
     console.log("get main socket", ENDPOINT)
   if(mainSocket === undefined || ENDPOINT_CURRENT !== ENDPOINT){
     ENDPOINT_CURRENT = ENDPOINT;
-    mainSocket=socketIOClient(ENDPOINT_CURRENT);
+    mainSocket=socketIOClient(ENDPOINT_CURRENT, {transports: ['websocket'],secure: true});
   }
   return mainSocket;
 }
