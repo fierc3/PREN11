@@ -25,6 +25,9 @@ For testing purposes the sending socket for the server doesn't require authentic
             await client.Emit("robot", "This was sent via c#");
             await client.DisconnectAsync();
 
+### Mockup
+Mockup for frontend can be viewed here:
+https://www.figma.com/file/5hFwzjT2aOdBZbCWnEnzoM/pren11?node-id=4%3A0
 
 
 
