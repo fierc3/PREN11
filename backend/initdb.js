@@ -2,7 +2,7 @@ const sqlite3 = require('sqlite3').verbose();
 
 console.log('Started init of sqllite database')
 // open a database connection
-let db = new sqlite3.Database('./techradar.db');
+let db = new sqlite3.Database('./pren11.db');
 
 
 // creating event table
@@ -18,7 +18,7 @@ CREATE TABLE event (
 
 db.exec(createEventsTable, (err) => {
     if(err){
-        console.warn("Error while creating user table", err)
+        console.warn("Error while creating event table", err)
     }else{
         console.log("Successfully created db");
     }
