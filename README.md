@@ -1,8 +1,11 @@
-# PREN11-Backend
-Backend Logic for PREN Project.
+# PREN11
+Code managemend for PREN Project.
 
+_/backend_
+Code for webapplication -> manages, stores and verifies data sent by the robot.
 
-The backend manages, stores and verifies data sent by the robot.
+_/robot_
+Code snippets for robot
 
 ## URLS
 
