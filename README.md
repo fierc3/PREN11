@@ -1,5 +1,5 @@
 # PREN11
-Code managemend for PREN Project.
+Code for PREN Project.
 
 _/backend_
 Code for webapplication -> manages, stores and verifies data sent by the robot.
