@@ -1,14 +1,149 @@
 import '../App.css';
-import React from "react";
+import { config } from '../Constants';
+import * as React from 'react';
+import CssBaseline from '@mui/material/CssBaseline';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import Footer from './Footer';
+import NavigationBar from './NavigationBar';
+import { Box } from '@mui/system';
+import { Alert, Grid, Snackbar, Typography } from '@mui/material';
+import RunEndCard from './cards/RunEndCard';
+import InProgressCard from './cards/InProgressCard';
+import PlantCard from './cards/PlantCard';
+import { getMainSocket } from './MainSocketSingleton';
+import socketIOClient from "socket.io-client";
+
+
+var ENDPOINT = config.url.API_URL;
 
 const Guest = () => {
+    const theme = createTheme({
+        typography: {
+            fontWeightLight: "300"
+        },
+        palette: {
+            primary: {
+                light: '#757ce8',
+                main: '#6200EE',
+                dark: '#002884',
+                contrastText: '#fff',
+            },
+            secondary: {
+                light: '#ff7961',
+                main: '#f44336',
+                dark: '#ba000d',
+                contrastText: '#000',
+            },
+        },
+    });
+
+    const [data, setData] = React.useState([])
+    const [run, setRun] = React.useState("is starting")
+    const [startDate, setStartDate] = React.useState("")
+    const [toast, setToast] = React.useState(false)
+    const [toastText, setToastText] = React.useState(false)
+
+    const updateMetaData = (event) => {
+        setRun(event.run);
+        let date = new Date(event.datetime).toLocaleString();
+        setStartDate("Run started at " + date);
+    }
+
+    const connect = () => {
+        let socket = socketIOClient(ENDPOINT, { transports: ['websocket'], secure: true });
+        socket.on("RobotOutput", roboMessage => {
+            let json = JSON.parse(roboMessage);
+            setData(arr => [...arr, json]);
+            if (data.length < 1 || json.run !== data[0].run) {
+                //new run, update whole app
+                updateData();
+            }
+            if (json.event_type === 1) {
+                setToastText("New Run Started!")
+            } else if (json.event_type === 2) {
+                const plant = JSON.parse(json.event_value);
+                setToastText(`Found ${plant.plantName}!`)
+            } else if (json.event_type === 3) {
+                setToastText("Run has finished")
+            }
+            setToast(true)
+
+        });
+    }
+
+    const updateData = async () => {
+        const response = await fetch(ENDPOINT + "/api/currentRun");
+        const json = await response.json();
+        setData(json);
+        if (json.length > 0) {
+            updateMetaData(json[0])
+        }
+
+    }
+
+    React.useEffect(() => {
+        updateData();
+        connect();
+    }, [])
+
+    let firstPlantName = "";
+
     return (
         <>
-            <h1>Hello Guest</h1>
-            <h2>The server is running, nothing for you to worry about</h2>
-            <div style={{width:"100vw", display: 'flex',alignItems:'center'}}>
-            <img src="https://c.tenor.com/xIuewwtwSd4AAAAC/jontron-squats.gif" style={{  margin: 'auto', width: '20%'}}></img>
-            </div>
+            <ThemeProvider theme={theme}>
+                <CssBaseline />
+                <NavigationBar />
+                <main>
+                    <Box sx={{ pt: "10vh", backgroundColor: "", height: "90vh" }}>
+                        <Typography gutterBottom variant="h5" component="span" position={"absolute"} paddingLeft={"30px"} paddingTop={"50px"}>
+                            Run {run}
+                        </Typography>
+                        <Typography gutterBottom variant="caption" component="span" position={"absolute"} paddingLeft={"30px"} paddingTop={"75px"}>
+                            {startDate}
+                        </Typography>
+                        <Box sx={{ width: "90vw", marginTop: "100px", marginLeft: "50px" }}>
+                            <Grid container spacing={6}>
+                                {data.filter(event => event.event_type !== 1).map((event, index) => {
+                                    const plant = JSON.parse(event.event_value);
+                                    if (index === 0) {
+                                        //first plant found, so needs to be the one at the start
+                                        firstPlantName = plant.plantName;
+                                        return (<Grid item key={event.event_id}>
+                                            <PlantCard name={plant.plantName} text={"Found at start"} />
+                                        </Grid>)
+                                    }
+                                    if (index > 0 && event.event_type === 2) {
+                                        return (
+                                            <Grid item key={event.event_id}>
+                                                <PlantCard name={plant.plantName} text={"Found at Position " + index} found={firstPlantName === plant.plantName} />
+                                            </Grid>
+                                        )
+                                    } else if (event.event_type === 3) {
+                                        return (
+                                            <Grid item key={event.event_id}>
+                                                <RunEndCard />
+                                            </Grid>
+                                        )
+                                    }
+                                })}
+                                {data.filter(e => e.event_type === 3).length === 0 &&
+                                    <Grid key={69669} item><InProgressCard text={"Searching..."} />
+                                    </Grid>}
+                            </Grid>
+                        </Box>
+                    </Box>
+                </main>
+                <Snackbar
+                    anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                    open={toast}
+                    autoHideDuration={3500}
+                    onClose={() => setToast(false)}
+                    sx={{ zIndex: 9999 }}
+                >
+                    <Alert severity="success">{toastText}</Alert>
+                </Snackbar>
+                <Footer />
+            </ThemeProvider>
         </>
     );
 }

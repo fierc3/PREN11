@@ -6,15 +6,7 @@ import { getMainSocket, disconnectMain } from './MainSocketSingleton';
 var ENDPOINT = config.url.API_URL;
 
 const Management = () => {
-  const [response, setResponse] = useState("NOTYETLOADED")
-  const [localTime, setLocalTime] = useState("NOTYETLOADED")
   const [activeCons, setActiveCons] = useState(-1)
-  const [diffTime, setDiffTime] = useState(0)
-  const [health, setHealth] = useState("UNKNOWN");
-  const matrix = Array.apply(null, Array(100))
-  var charSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890+>?-$#@%&*';
-  const [matrixMode, setMatrixMode] = useState(false);
-  const [diffs, setDiffs] = useState([]);
   const [robotMessages, setRobotMessages] = useState([
     "Robot Messages will be displayed here"
   ])
@@ -23,91 +15,38 @@ const Management = () => {
 
   const connect = () => {
     let socket = getMainSocket(ENDPOINT)
-    socket.on("Time", data => {
-      const timeData = data;
-      const currTime = new Date().getTime();
-      const remoteMs = Date.parse(timeData);
-
-      //calculate differents between remote and local
-      const diff = currTime - remoteMs;
-      if (diff < 0) {
-        return;
-      }
-      setDiffTime(diff);
-      if (diffs > 100) {
-        (diffs.splice(1, 100))
-      }
-      if (diff >= 0) {
-        setDiffs(arr => [...arr, diff]);
-      }
-      setResponse(remoteMs + "");
-      setLocalTime(currTime + "");
-    });
-
-    socket.on("ClientCount", data => {
-      const activeConData = data;
-      //active connections
-      setActiveCons(activeConData)
-    });
-
-
     socket.on("RobotOutput", roboMessage => {
       console.log("Received on Robotoutput " + roboMessage);
       setRobotMessages(arr => [...arr, roboMessage + "|" + new Date().getTime()])
     })
   }
 
-  const sendMessageAsRobot = (msg) => {
+  const sendStart = () => {
     let socket = getMainSocket(ENDPOINT);
-    socket.emit('robot', msg + " | " + new Date().getTime());
+    socket.emit('RobotInput', JSON.stringify({event_type:"START"}));
   }
+
+  const sendEnd = () => {
+    let socket = getMainSocket(ENDPOINT);
+    socket.emit('RobotInput', JSON.stringify({event_type:"END"}));
+  }
+
+  const sendPlant = (name) => {
+    let socket = getMainSocket(ENDPOINT);
+    socket.emit('RobotInput', JSON.stringify({event_type:"PLANT", event_value:{plantName:name}}));
+  }
+
 
 
   useEffect(() => {
     connect();
   }, []);
 
-  const calcMatrix = () => {
-    let resultMatrix;
-    matrix.forEach((part, index, array) => {
-      var colLength = Math.floor(Math.random() * 20);
-      var col = Array.apply(null, Array(colLength))
-      col.forEach((colPart, colIndex, colArray) => {
-        var randRep = Math.floor(Math.random() * (charSet.length));
-        var char = charSet[randRep];
-        colArray[colIndex] = char;
-      })
-      array[index] = col;
-      resultMatrix = array;
-    })
-    return resultMatrix;
-  }
-
   const calcAverage = (numbers) => {
     const sum = numbers.reduce((a, b) => a + b, 0);
     const avg = (sum / numbers.length) || 0;
     return avg;
   }
-
-  const healthCheck = () => {
-    const currTime = new Date().getTime();
-    var state = "UNKNOWN"
-    var msg = ""
-    if (Number.isNaN(+localTime)) {
-      state = "CRITICAL"
-      msg = " - NO PREV TIME FOUND"
-      setHealth(state);
-      return state + msg;
-    }
-    if (parseInt(localTime) - 3000 > currTime) {
-      state = "CRITICAL"
-    } else {
-      state = "HEALTHY"
-    }
-    setHealth(state);
-    return state + msg;
-  }
-
 
   const customCommands = {
     echo: {
@@ -130,16 +69,6 @@ const Management = () => {
         })
       }
     },
-    health: {
-      description: 'Check health of backend server',
-      fn: (...args) => {
-        return new Promise((resolve, reject) => {
-          setTimeout(() => {
-            resolve(healthCheck())
-          }, 1000)
-        })
-      }
-    },
     rickroll: {
       description: '¯\\_(ツ)_/¯.',
       fn: (...args) => {
@@ -159,18 +88,6 @@ const Management = () => {
             var res = Object.entries(customCommands).map((key, value) => key[0] + " - " + key[1].description + "\n")
             resolve(res.join(""));
           }, 1000)
-        })
-      }
-    },
-    matrix: {
-      description: 'Enter the matrix',
-      fn: (...args) => {
-        return new Promise((resolve, reject) => {
-          setMatrixMode(true)
-          setTimeout(() => {
-            setMatrixMode(false)
-            resolve("Hello Neo")
-          }, 15000)
         })
       }
     },
@@ -219,21 +136,30 @@ const Management = () => {
         })
       }
     },
-    sendRoboMsg: {
-      description: 'Send msg disguised as robot',
+    sendStart: {
+      description: 'Send start run',
       fn: (...args) => {
         return new Promise((resolve, reject) => {
-          console.log(args)
-          if(args.length !== 2){
-            resolve("Needs 2 arguements");
-            return
-          }
-          if(args[0] === 'hellofriend'){
-            sendMessageAsRobot(args[1])
+            sendStart()
             resolve("Done");
-            return
-          }
-
+        })
+      }
+    },
+    sendEnd: {
+      description: 'Send end run',
+      fn: (...args) => {
+        return new Promise((resolve, reject) => {
+            sendEnd()
+            resolve("Done");
+        })
+      }
+    },
+    sendPlant: {
+      description: 'Send plant',
+      fn: (...args) => {
+        return new Promise((resolve, reject) => {
+            sendPlant(args[0])
+            resolve("Done");
         })
       }
     }
@@ -241,40 +167,21 @@ const Management = () => {
 
   return (
     <main className="area" >
-      {matrixMode &&
-        <div unselectable="on" class="inbackground unselectable">
-          <div className="mover">
-            <div className="matrix-container">
-              {calcMatrix().map((col, i) => {
-                return (<div className="matrix-col">
-                  {col.map((char, i) => {
-                    return (<p className="m-letter">{char}</p>)
-                  })
-                  })
-                </div>
-                )
-              })}
-            </div>
-          </div>
-        </div>
-      }
       <h1>PREN 11</h1>
       <div className="live-data" style={{ borderBottom: "3px solid green" }} >
-        <h3>Analytics (HEALTH CHECK: <span className={`health-result ${health.toLowerCase()}`}>{health}</span>)</h3>
+        <h3>Analytics</h3>
         <div style={{ display: 'flex', flexDirection: 'row', width: '100v', height:'30vh' }}>
           <div style={{ flexGrow: 1 }}>
             <p>
-              Time on Remote &emsp; {response}
             </p>
             <p>
-              Time  on Localhost &emsp; {localTime}
             </p>
-            <h2>Difference: <span>{diffTime}ms</span> // Average: {calcAverage(diffs)}ms
+            <h2>
             </h2>
           </div>
           <div style={{ flexGrow: 1, textAlign: 'end',  height:'100%', paddingRight: '3em',}}>
           <p>active connections: {activeCons}</p>
-          <div style={{float: 'right', paddingRight: '10px', overflow:'auto', height:'100%'}}>
+          <div style={{float: 'right', paddingRight: '10px', overflow:'auto', height:'100px'}}>
             {robotMessages.map(x => {
               return(<p> {x} </p>)
             })}

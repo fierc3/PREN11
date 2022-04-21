@@ -115,3 +115,18 @@
 .matrix-col{
   flex-grow: 1;
 }
+
+
+
+@media (min-width: 467px) {                  
+  #smallTitle {
+     display: none;
+  }    
+}
+
+@media (max-width: 467px) {   
+  .largeTitle {
+     display: none;
+  }
+
+}
