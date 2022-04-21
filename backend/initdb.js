@@ -12,7 +12,7 @@ CREATE TABLE event (
     run INTEGER NOT NULL,
     datetime TEXT NOT NULL,
     event_type INTEGER NOT NULL,
-    event_value TEXT NOT NULL
+    event_value TEXT
 );
 `;
 
