@@ -59,17 +59,15 @@ namespace PiController
                     if(end == false && latestValue.text.Contains("plant"))
                     {
                         //send to plantId
-                        if(mode == 2) //Online Mode check
+                        if (mode == 2) //Online Mode check
                         {
-                           Console.WriteLine("Running in Online Mode, preparing to send image to plantId");
-                           var imageBytes = latestValue.image.ToBytes();
-                           var plantIdResult = PlantIdApiHandler.SendToPlantId(imageBytes);
-                            //TODO: Send Result via socket.io
+                            Console.WriteLine("Running in Online Mode, preparing to send image to plantId");
+                            var imageBytes = latestValue.image.ToBytes();
+                            var plantIdResult = PlantIdApiHandler.SendToPlantId(imageBytes);
+                            // Send Result to Webserver via socket.io
                             Console.WriteLine("Sending found plant via socket: " + plantIdResult);
                             serverCommunicator.SendPlant(plantIdResult);
                         }
-
-
                     }
                 }
             }

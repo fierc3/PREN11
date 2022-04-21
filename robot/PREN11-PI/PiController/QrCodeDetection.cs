@@ -73,6 +73,9 @@ namespace QrCodeDetection
                 image = GrabFrame();
                 //Convert to gray scale to improve the image processing
                 Mat gray = ConvertGrayScale(image);
+                //
+                //TODO: Crop between 25% and 50%
+                //
                 var detector = new QRCodeDetector();
                 Point2f[] points = null;
                 var result = detector.DetectAndDecode(gray, out points);
@@ -105,7 +108,7 @@ namespace QrCodeDetection
                 System.Threading.Thread.Sleep(500);
             }
 
-            var croppedImage = CropImageForPlant(image);
+            var croppedImage = CropImageForPlant(image); //TODO: Fix cropping as suggested in docs
             //image.Dispose();
 
             //display result
