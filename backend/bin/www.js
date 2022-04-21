@@ -8,55 +8,52 @@ var app = require('../app');
 var debug = require('debug')('backend:server');
 var http = require('http');
 const socketIo = require("socket.io");
+const db = require('../db');
 
 
 var httpServer = http.createServer(app);
 startHttpServer();
 
 //sockets
-const io = socketIo(httpServer,{
+const io = socketIo(httpServer, {
   cors: {
     origin: '*',
   },
-  allowEIO3: true 
+  allowEIO3: true
 })
-let interval;
+let countConnections = 0;
 
 io.on("connection", (socket) => {
-  console.log("New client connected");
-  if (interval) {
-    clearInterval(interval);
-  }
-  interval =
-    setInterval(() => {
-      emitTime(socket);
-      emitClientCount(socket);
-    }, 1000);
-  socket.on("robot", (msg) => {
+  countConnections++;
+  console.log(`New client connected, count[${countConnections}]`);
+
+  socket.on("RobotInput", (msg) => {
+    msg = JSON.parse(msg);
     console.log(`Robot sent message ${msg}`);
-    emitRobotMessage(socket, msg + "|"+ new Date().getTime())
+    if (msg.event_type === 'START') {
+      db.beginRun();
+    } else if (msg.event_type === 'END') {
+      db.endRun();
+    } else if (msg.event_type === 'PLANT') {
+      if (msg.event_value)
+        db.insertPlant(JSON.stringify(msg.event_value))
+    } else {
+      console.log("Command not recognized", msg);
+    }
+
+    //emitRobotMessage(socket, msg + "|" + new Date().getTime())
   });
   socket.on("disconnect", () => {
+    countConnections--;
     console.log("Client disconnected");
-    clearInterval(interval);
   });
 });
 
+db.init(io);
 
-const emitTime = socket => {
-  var clientCount = io.engine.clientsCount;
-  // Emitting a new message. Will be consumed by the client
-  socket.emit("Time", new Date());
-};
-const emitClientCount = socket => {
-  var clientCount = io.engine.clientsCount;
-  // Emitting a new message. Will be consumed by the client
-  socket.emit("ClientCount",clientCount);
-};
-
-const emitRobotMessage = (socket, msg) => {
+const emitRobotMessage = (msg) => {
   console.log(`Emitting broadcast: ${msg}`);
-  io.emit("RobotOutput", msg );
+  io.emit("RobotOutput", msg);
 }
 
 
@@ -64,13 +61,13 @@ function normalizePort(val) {
   var port = parseInt(val, 10);
 
   if (isNaN(port)) {
-      // named pipe
-      return val;
+    // named pipe
+    return val;
   }
 
   if (port >= 0) {
-      // port number
-      return port;
+    // port number
+    return port;
   }
 
   return false;
