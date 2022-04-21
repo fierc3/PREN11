@@ -3,17 +3,29 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var cors = require('cors')
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+const { getEventsFromCurrentRun } = require('./db');
 
 var app = express();
+app.use(cors())
 
 //init react
 // serve the react app files
 console.log("initing react files")
 app.use(express.static(`${__dirname}/react/build`));
-app.get('*', (req, res) => res.sendFile(path.resolve('react', 'build', 'index.html')));
+app.get('/', (req, res) => res.sendFile(path.resolve('react', 'build', 'index.html')));
+app.get('/admin', (req, res) => res.sendFile(path.resolve('react', 'build', 'index.html')));
+
+
+app.get('/api/currentRun', (req,res) => {
+  console.log("Current Run Data Requested");
+  getEventsFromCurrentRun((events) => {
+    res.status(200).json(events)
+  })
+})
 
 
 /*
