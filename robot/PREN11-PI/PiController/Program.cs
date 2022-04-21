@@ -37,9 +37,9 @@ namespace PiController
                 //1. Try and setup connection with all components (server connection, camera test...)
                 try
                 {
+                    serverCommunicator = new ServerCommunicator("https://tactile-rigging-333212.oa.r.appspot.com");
                     detector.Init(visualize == 1);
                     Console.WriteLine("Setting up Server Communicator");
-                    serverCommunicator = new ServerCommunicator("https://tactile-rigging-333212.oa.r.appspot.com");
 
                 }
                 catch (Exception ex)
