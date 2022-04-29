@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using MMALSharp;
-using MMALSharp.Common;
-using MMALSharp.Handlers;
+using Camera;
 using QrCodeDetection;
 
 namespace PiController
@@ -13,6 +11,7 @@ namespace PiController
         static int selection = 1; //1 = webcam, 2 = PI camera
         static int visualize = 1; //1 = visualize, 2 = dont visualize
         static int mode = 1; //1 = offline, 2 = online
+        static ICameraModule camera = new CameraPiModule();
 
         private static void loadFlags(string[] args)
         {
@@ -24,27 +23,8 @@ namespace PiController
                 int.TryParse(args[2], out mode);
         }
 
-        private async static void testCamera()
-        {
-            // Singleton initialized lazily. Reference once in your application.
-            MMALCamera cam = MMALCamera.Instance;
-
-            using (var imgCaptureHandler = new ImageStreamCaptureHandler("/home/pren11/Pictures/", "jpg"))
-            {
-                await cam.TakePicture(imgCaptureHandler, MMALEncoding.JPEG, MMALEncoding.I420);
-            }
-
-            // Cleanup disposes all unmanaged resources and unloads Broadcom library. To be called when no more processing is to be done
-            // on the camera.
-            cam.Cleanup();
-        }
-
         static void Main(string[] args)
         {
-            testCamera();
-            Console.ReadKey();
-            return;
-
 
             Console.WriteLine("++++++ PREN11 PiController is starting ++++++");
             Console.WriteLine("Using args: " + String.Join(", ", args));
@@ -60,8 +40,9 @@ namespace PiController
                 //1. Try and setup connection with all components (server connection, camera test...)
                 try
                 {
-                    serverCommunicator = new ServerCommunicator("https://tactile-rigging-333212.oa.r.appspot.com");
-                    detector.Init(visualize == 1);
+                    //serverCommunicator = new ServerCommunicator("https://tactile-rigging-333212.oa.r.appspot.com");
+                    //set if should visualize  and which camera module to use
+                    detector.Init(visualize == 1, camera);
                     Console.WriteLine("Setting up Server Communicator");
 
                 }
@@ -73,7 +54,7 @@ namespace PiController
                 }
                 Boolean end = false;
                 //2. Start Run
-                serverCommunicator.SendStart();
+                //serverCommunicator.SendStart();
                 while (end == false)
                 {
                     var latestValue = detector.DetectUniqueCode();
