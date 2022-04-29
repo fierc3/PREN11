@@ -1,4 +1,5 @@
-﻿using OpenCvSharp;
+﻿using Camera;
+using OpenCvSharp;
 using System;
 using System.Collections.Generic;
 
@@ -15,17 +16,14 @@ namespace QrCodeDetection
 
         List<Code> codes = new List<Code>();
 
-        VideoCapture videoCapture;
+        ICameraModule videoCapture;
         bool visualizeDetection = true;
 
-        public void Init(bool visualize)
+        public void Init(bool visualize, ICameraModule camera)
         {
             this.visualizeDetection = visualize;
-            //Initialise the video capture module
-            videoCapture = new VideoCapture(0);
-            
-            videoCapture.Set(3, videoCapture.FrameWidth / 2); //Set the frame width
-            videoCapture.Set(4, videoCapture.FrameHeight / 2); //Set the frame height
+            videoCapture = camera;
+            videoCapture.Init();
         }
         public void Release()
         {
@@ -79,6 +77,7 @@ namespace QrCodeDetection
                 var detector = new QRCodeDetector();
                 Point2f[] points = null;
                 var result = detector.DetectAndDecode(gray, out points);
+                Console.WriteLine(result);
                 gray.Dispose();
                 if (result.Length > 1)
                 {
@@ -101,7 +100,7 @@ namespace QrCodeDetection
                 if (visualizeDetection)
                 {
                     MarkFeatures(image);
-                    //Cv2.ImShow("frame", image);
+                    Cv2.ImShow("frame", image);
                     if (Cv2.WaitKey(1) == (int)ConsoleKey.Enter)
                         break;
                 }
