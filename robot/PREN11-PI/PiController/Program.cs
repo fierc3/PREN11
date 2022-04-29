@@ -29,7 +29,7 @@ namespace PiController
             // Singleton initialized lazily. Reference once in your application.
             MMALCamera cam = MMALCamera.Instance;
 
-            using (var imgCaptureHandler = new ImageStreamCaptureHandler("/home/pi/images/", "jpg"))
+            using (var imgCaptureHandler = new ImageStreamCaptureHandler("/home/pren11/Pictures/", "jpg"))
             {
                 await cam.TakePicture(imgCaptureHandler, MMALEncoding.JPEG, MMALEncoding.I420);
             }
@@ -42,6 +42,7 @@ namespace PiController
         static void Main(string[] args)
         {
             testCamera();
+            Console.ReadKey();
             return;
 
 
