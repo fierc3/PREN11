@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using MMALSharp;
+using MMALSharp.Common;
+using MMALSharp.Handlers;
 using QrCodeDetection;
 
 namespace PiController
@@ -21,8 +24,27 @@ namespace PiController
                 int.TryParse(args[2], out mode);
         }
 
+        private async static void testCamera()
+        {
+            // Singleton initialized lazily. Reference once in your application.
+            MMALCamera cam = MMALCamera.Instance;
+
+            using (var imgCaptureHandler = new ImageStreamCaptureHandler("/home/pi/images/", "jpg"))
+            {
+                await cam.TakePicture(imgCaptureHandler, MMALEncoding.JPEG, MMALEncoding.I420);
+            }
+
+            // Cleanup disposes all unmanaged resources and unloads Broadcom library. To be called when no more processing is to be done
+            // on the camera.
+            cam.Cleanup();
+        }
+
         static void Main(string[] args)
         {
+            testCamera();
+            return;
+
+
             Console.WriteLine("++++++ PREN11 PiController is starting ++++++");
             Console.WriteLine("Using args: " + String.Join(", ", args));
 
