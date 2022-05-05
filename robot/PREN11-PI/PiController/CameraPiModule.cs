@@ -26,14 +26,14 @@ namespace Camera
             MMALCameraConfig.ISO = 400;
         }
 
-        public bool Read(Mat image)
+        public byte[] Read()
         {
             using (var imgCaptureHandler = new InMemoryCaptureHandler())
             {
                 cam.TakePicture(imgCaptureHandler, MMALEncoding.JPEG, MMALEncoding.I420).Wait();
-                image.SetArray(imgCaptureHandler.WorkingData.ToArray());
+                return imgCaptureHandler.WorkingData.ToArray();
             }
-            return true;
+            return null;
         }
 
         public void Release()
