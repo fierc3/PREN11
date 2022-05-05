@@ -12,7 +12,7 @@ namespace Camera
         public void Init();
         //public Mat Capture(bool save);
 
-        public bool Read( Mat image);
+        public byte[] Read();
         //public void ShowImage(Mat image);
         public void Release();
       

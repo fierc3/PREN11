@@ -34,9 +34,9 @@ namespace QrCodeDetection
         private Mat GrabFrame()
         {
             Mat image = new Mat();
-            //Capture frame by frame
-            videoCapture.Read(image);
-            return image;
+            var bytes = videoCapture.Read();
+            //Mat(int rows, int cols, MatType type, Array data
+            return Mat.FromImageData(bytes);
         }
 
         private Mat ConvertGrayScale(Mat image)

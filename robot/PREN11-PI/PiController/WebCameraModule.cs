@@ -20,14 +20,26 @@ namespace Camera
            
         }
 
-        public bool Read(Mat image)
+        public byte[] Read()
         {
-            return videoCapture.Read(image);
+            Mat result = new Mat();
+            videoCapture.Read(result);
+            return result.ToBytes();
         }
 
         public void Release()
         {
             videoCapture.Release();
+        }
+
+        public int GetRows()
+        {
+            return videoCapture.FrameHeight;
+        }
+
+        public int GetCols()
+        {
+            return videoCapture.FrameWidth;
         }
     }
 }
