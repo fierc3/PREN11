@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using Camera;
+using OpenCvSharp;
 using QrCodeDetection;
 
 namespace PiController
@@ -8,7 +10,6 @@ namespace PiController
 
     class Program
     {
-        static int selection = 1; //1 = webcam, 2 = PI camera
         static int visualize = 1; //1 = visualize, 2 = dont visualize
         static int mode = 1; //1 = offline, 2 = online
         static ICameraModule camera = new CameraPiModule();
@@ -16,14 +17,41 @@ namespace PiController
         private static void loadFlags(string[] args)
         {
             if (args.Length > 0)
-                int.TryParse(args[0], out selection);
+                int.TryParse(args[0], out visualize);
             if (args.Length > 1)
-                int.TryParse(args[1], out visualize);
-            if (args.Length > 2)
-                int.TryParse(args[2], out mode);
+                int.TryParse(args[1], out mode);
         }
 
-        static void Main(string[] args)
+        private static void runRecordingMode(string[] args)
+        {
+            int delay = 0;
+            int max = 100;
+            int input = 0;
+
+            if (args.Length > 0)
+                int.TryParse(args[0], out delay);
+            if (args.Length > 1)
+                int.TryParse(args[1], out max);
+            if (args.Length > 2)
+                int.TryParse(args[2], out input);
+
+            Console.WriteLine("Running Record Mode");
+            ICameraModule camera = input == 0 ? new WebCameraModule() : new CameraPiModule();
+            camera.Init();
+            Console.WriteLine("Images will be saved under: " + Path.GetFullPath("run-xxxxx.jgp"));
+            Console.WriteLine($"Delay Between Images:{delay}, Capture count: {max}");
+            for(int i = 0; i < 100; i++)
+            {
+                Console.WriteLine("Saving Image " + i);
+                var bytes = camera.Read();
+                long milliseconds = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+                File.WriteAllBytes("run-" + milliseconds + ".jpg", bytes);
+
+            }
+            Console.WriteLine("Finishing Record Mode");
+
+        }
+        private static void runParcour(string[] args)
         {
 
             Console.WriteLine("++++++ PREN11 PiController is starting ++++++");
@@ -40,7 +68,10 @@ namespace PiController
                 //1. Try and setup connection with all components (server connection, camera test...)
                 try
                 {
-                    //serverCommunicator = new ServerCommunicator("https://tactile-rigging-333212.oa.r.appspot.com");
+                    if (mode == 2)
+                    {
+                        serverCommunicator = new ServerCommunicator("https://tactile-rigging-333212.oa.r.appspot.com");
+                    }
                     //set if should visualize  and which camera module to use
                     detector.Init(visualize == 1, camera);
                     Console.WriteLine("Setting up Server Communicator");
@@ -54,13 +85,17 @@ namespace PiController
                 }
                 Boolean end = false;
                 //2. Start Run
-                //serverCommunicator.SendStart();
+                if (mode == 2)
+                {
+                    serverCommunicator.SendStart();
+                }
+
                 while (end == false)
                 {
                     var latestValue = detector.DetectUniqueCode();
                     // process value
                     end = (latestValue.text.Equals("end"));
-                    if(end == false && latestValue.text.Contains("plant"))
+                    if (end == false && latestValue.text.Contains("plant"))
                     {
                         //send to plantId
                         if (mode == 2) //Online Mode check
@@ -84,11 +119,11 @@ namespace PiController
             finally
             {
                 Console.WriteLine("Ending Run");
-                if(detector != null)
+                if (detector != null)
                 {
                     detector.Release();
                 }
-                if(serverCommunicator != null)
+                if (serverCommunicator != null)
                 {
                     serverCommunicator.SendEnd();
                 }
@@ -98,6 +133,11 @@ namespace PiController
 
 
 
+        }
+
+        static void Main(string[] args)
+        {
+            runRecordingMode(args);
         }
     }
 }
