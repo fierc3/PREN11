@@ -57,10 +57,11 @@ namespace Camera
                 splitter.Outputs[0].ConnectTo(imgEncoder);
                 cam.Camera.PreviewPort.ConnectTo(nullSink);
 
+                Task.Delay(2000).Wait();
 
                 CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(1000));
 
-                cam.ProcessAsync(cam.Camera.VideoPort, cts.Token);
+                cam.ProcessAsync(cam.Camera.VideoPort);
                 imgCaptureHandler.PostProcess();
 
             }
