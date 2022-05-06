@@ -18,7 +18,7 @@ namespace Camera
     public class CameraPiModule : ICameraModule
     {
         MMALCamera cam;
-        var imgCaptureHandler = new InMemoryCaptureHandler()
+        InMemoryCaptureHandler imgCaptureHandler = new InMemoryCaptureHandler();
 
         public void Init()
         {
