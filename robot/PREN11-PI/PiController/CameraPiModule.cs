@@ -18,14 +18,15 @@ namespace Camera
     public class CameraPiModule : ICameraModule
     {
         MMALCamera cam;
-        //InMemoryCaptureHandler imgCaptureHandler = new InMemoryCaptureHandler();
-        byte[] lastImage = new byte[0];
+        CustomInMemoryCaptureHandler imgCaptureHandler = new CustomInMemoryCaptureHandler();
 
         class CustomInMemoryCaptureHandler : InMemoryCaptureHandler
         {
+            public byte[] lastImage = new byte[0];
             override public void PostProcess()
             {
                 Console.WriteLine("Post Process hehehe " + this.WorkingData.Count());
+                lastImage = this.WorkingData.ToArray();
                 this.WorkingData.Clear();
             }
         }
@@ -40,7 +41,6 @@ namespace Camera
 
              cam = MMALCamera.Instance;
 
-            using (var imgCaptureHandler = new CustomInMemoryCaptureHandler())
             using (var splitter = new MMALSplitterComponent())
             using (var imgEncoder = new MMALImageEncoder(continuousCapture: true))
             using (var nullSink = new MMALNullSinkComponent())
@@ -68,7 +68,7 @@ namespace Camera
 
         public byte[] Read()
         {
-            return lastImage;
+            return imgCaptureHandler.lastImage;
         }
 
         public void Release()
