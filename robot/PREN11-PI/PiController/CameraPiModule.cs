@@ -39,32 +39,16 @@ namespace Camera
             MMALCameraConfig.ISO = 400;
             MMALCameraConfig.StillBurstMode = true;
 
-             cam = MMALCamera.Instance;
+            cam = MMALCamera.Instance;
         }
 
         public byte[] Read()
         {
-            using (var splitter = new MMALSplitterComponent())
-            using (var imgEncoder = new MMALImageEncoder(continuousCapture: true))
-            using (var nullSink = new MMALNullSinkComponent())
+
+            using (var imgCaptureHandler = new InMemoryCaptureHandler())
             {
-                cam.ConfigureCameraSettings();
-
-                var portConfig = new MMALPortConfig(MMALEncoding.JPEG, MMALEncoding.I420, quality: 50);
-
-
-                // Create our component pipeline.         
-                imgEncoder.ConfigureOutputPort(portConfig, imgCaptureHandler);
-
-                cam.Camera.VideoPort.ConnectTo(splitter);
-                splitter.Outputs[0].ConnectTo(imgEncoder);
-                cam.Camera.PreviewPort.ConnectTo(nullSink);
-
-                //Task.Delay(2000).Wait();
-                CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(250));
-
-                cam.ProcessAsync(cam.Camera.VideoPort, cts.Token).Wait();
-                return imgCaptureHandler.lastImage;
+                cam.TakePicture(imgCaptureHandler, MMALEncoding.JPEG, MMALEncoding.I420).Wait();
+                return imgCaptureHandler.WorkingData.ToArray();
             }
         }
 
