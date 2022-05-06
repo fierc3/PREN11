@@ -39,7 +39,7 @@ namespace Camera
             {
                 cam.ConfigureCameraSettings();
 
-                var portConfig = new MMALPortConfig(MMALEncoding.JPEG, MMALEncoding.I420, quality: 90);
+                var portConfig = new MMALPortConfig(MMALEncoding.JPEG, MMALEncoding.I420, quality: 50);
 
                 // Create our component pipeline.         
                 imgEncoder.ConfigureOutputPort(portConfig, imgCaptureHandler);
@@ -49,9 +49,8 @@ namespace Camera
                 cam.Camera.PreviewPort.ConnectTo(nullSink);
 
 
-                CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(15));
-
-                // Process images for 15 seconds.        
+                CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(1));
+      
                 cam.ProcessAsync(cam.Camera.VideoPort, cts.Token).Wait();
                 return imgCaptureHandler.WorkingData.ToArray();
             }
