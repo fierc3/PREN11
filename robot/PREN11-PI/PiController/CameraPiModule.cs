@@ -40,6 +40,7 @@ namespace Camera
                 // stored in the "WorkingData" property plus the data found in the "data" parameter indicates you have a full image frame.
 
                 // The call to base.Process will add the data to the WorkingData list.
+                WorkingData.AddRange(ctx.Data);
                 base.Process(ctx);
 
                 if (ctx.Eos)
