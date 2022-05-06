@@ -43,8 +43,9 @@ namespace PiController
             Console.WriteLine($"Delay Between Images:{delay}ms, Capture count: {max}");
             for(int i = 0; i < max; i++)
             {
-                Console.WriteLine("Saving Image " + i);
+                Console.WriteLine("Starting Image " + i);
                 var bytes = camera.Read();
+                Console.WriteLine("Read Image " + i);
                 long milliseconds = DateTimeOffset.Now.ToUnixTimeMilliseconds();
                 File.WriteAllBytesAsync("run-" + milliseconds + ".jpg", bytes);
                 Thread.Sleep(delay);
