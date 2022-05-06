@@ -68,7 +68,6 @@ namespace Camera
             MMALCameraConfig.StillBurstMode = true;
 
             cam = MMALCamera.Instance;
-            cam.ConfigureCameraSettings();
         }
 
         public byte[] Read()
