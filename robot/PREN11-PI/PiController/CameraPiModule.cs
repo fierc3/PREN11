@@ -63,7 +63,7 @@ namespace Camera
             //MMALCameraConfig.VideoStabilisation = true;
 
             MMALCameraConfig.StillFramerate = new MMAL_RATIONAL_T(20, 1); // Set to 20fps. Default is 30fps.
-            MMALCameraConfig.ShutterSpeed = 250000; //2000000; // Set to 2s exposure time. Default is 0 (auto).
+            MMALCameraConfig.ShutterSpeed = 100000; //2000000; // Set to 2s exposure time. Default is 0 (auto).
             MMALCameraConfig.ISO = 400;
             MMALCameraConfig.StillBurstMode = true;
 
@@ -89,7 +89,7 @@ namespace Camera
                 cam.Camera.PreviewPort.ConnectTo(nullSink);
 
                 //Task.Delay(2000).Wait();
-                CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(250));
+                CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(100));
 
                 cam.ProcessAsync(cam.Camera.VideoPort, cts.Token).Wait();
                 return imgCaptureHandler.GetLastImage();
