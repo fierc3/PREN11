@@ -27,6 +27,7 @@ namespace Camera
 
             public byte[] GetLastImage()
             {
+                Console.WriteLine(lastImage.Length);
                 return lastImage;
             }
 
@@ -58,7 +59,7 @@ namespace Camera
         public void Init()
         {
             MMALCameraConfig.StillResolution = new Resolution(640, 480); // Set to 640 x 480. Default is 1280 x 720.
-            MMALCameraConfig.VideoResolution = new Resolution(640, 480); // Set to 640 x 480. Default is 1280 x 720.
+            //MMALCameraConfig.VideoResolution = new Resolution(640, 480); // Set to 640 x 480. Default is 1280 x 720.
             //MMALCameraConfig.VideoStabilisation = true;
 
             MMALCameraConfig.StillFramerate = new MMAL_RATIONAL_T(20, 1); // Set to 20fps. Default is 30fps.
