@@ -61,6 +61,7 @@ namespace Camera
                 CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(250));
 
                 cam.ProcessAsync(cam.Camera.VideoPort, cts.Token);
+                imgCaptureHandler.PostProcess();
 
             }
         }
