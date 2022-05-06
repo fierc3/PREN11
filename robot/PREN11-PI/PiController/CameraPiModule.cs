@@ -18,19 +18,7 @@ namespace Camera
     public class CameraPiModule : ICameraModule
     {
         MMALCamera cam;
-        CustomInMemoryCaptureHandler imgCaptureHandler = new CustomInMemoryCaptureHandler();
-
-        class CustomInMemoryCaptureHandler : InMemoryCaptureHandler
-        {
-            public byte[] lastImage = new byte[0];
-            override public void PostProcess()
-            {
-                Console.WriteLine("Post Process hehehe " + this.WorkingData.Count());
-                lastImage = this.WorkingData.ToArray();
-                this.WorkingData.Clear();
-            }
-        }
-
+        InMemoryCaptureHandler imgCaptureHandler = new InMemoryCaptureHandler();
         public void Init()
         {
             MMALCameraConfig.StillResolution = new Resolution(640, 480); // Set to 640 x 480. Default is 1280 x 720.
@@ -39,7 +27,7 @@ namespace Camera
             MMALCameraConfig.ISO = 400;
             MMALCameraConfig.StillBurstMode = true;
 
-             cam = MMALCamera.Instance;
+            cam = MMALCamera.Instance;
 
             using (var splitter = new MMALSplitterComponent())
             using (var imgEncoder = new MMALImageEncoder(continuousCapture: true))
@@ -47,8 +35,7 @@ namespace Camera
             {
                 cam.ConfigureCameraSettings();
 
-                var portConfig = new MMALPortConfig(MMALEncoding.JPEG, MMALEncoding.I420, quality: 50);
-
+                var portConfig = new MMALPortConfig(MMALEncoding.JPEG, MMALEncoding.I420, quality: 90);
 
                 // Create our component pipeline.         
                 imgEncoder.ConfigureOutputPort(portConfig, imgCaptureHandler);
@@ -57,19 +44,18 @@ namespace Camera
                 splitter.Outputs[0].ConnectTo(imgEncoder);
                 cam.Camera.PreviewPort.ConnectTo(nullSink);
 
+                // Camera warm up time
                 Task.Delay(2000).Wait();
-
-                CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(1000));
-
-                cam.ProcessAsync(cam.Camera.VideoPort, cts.Token).Wait();
-                //imgCaptureHandler.PostProcess();
 
             }
         }
 
         public byte[] Read()
         {
-            return imgCaptureHandler.lastImage;
+            CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(500));  
+            cam.ProcessAsync(cam.Camera.VideoPort, cts.Token).Wait();
+            return imgCaptureHandler.WorkingData.ToArray();
+
         }
 
         public void Release()
