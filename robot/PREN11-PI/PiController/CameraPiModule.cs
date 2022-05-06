@@ -36,7 +36,7 @@ namespace Camera
             MMALCameraConfig.StillResolution = new Resolution(640, 480); // Set to 640 x 480. Default is 1280 x 720.
             MMALCameraConfig.StillFramerate = new MMAL_RATIONAL_T(20, 1); // Set to 20fps. Default is 30fps.
             MMALCameraConfig.ShutterSpeed = 4; //2000000; // Set to 2s exposure time. Default is 0 (auto).
-            MMALCameraConfig.ISO = 400;
+            MMALCameraConfig.ISO = 1;
             MMALCameraConfig.StillBurstMode = true;
 
             cam = MMALCamera.Instance;
