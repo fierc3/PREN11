@@ -19,6 +19,7 @@ namespace Camera
     {
         MMALCamera cam;
         InMemoryCaptureHandler imgCaptureHandler = new InMemoryCaptureHandler();
+        byte[] lastImage = new byte[0];
 
         public void Init()
         {
@@ -49,14 +50,15 @@ namespace Camera
 
                 //CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(1000));
 
-                cam.ProcessAsync(cam.Camera.VideoPort);//cts.Token
+                cam.ProcessAsync(cam.Camera.VideoPort).Wait();//cts.Token
+                lastImage = imgCaptureHandler.WorkingData.ToArray();
 
             }
         }
 
         public byte[] Read()
         {
-            return imgCaptureHandler.WorkingData.ToArray();
+            return lastImage;
         }
 
         public void Release()
