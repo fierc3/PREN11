@@ -25,6 +25,7 @@ namespace Camera
             public byte[] lastImage = new byte[0];
             override public void PostProcess()
             {
+                Console.WriteLine(WorkingData.Count());
                 lastImage = this.WorkingData.ToArray();
                 this.WorkingData.Clear();
             }
