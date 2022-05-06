@@ -25,7 +25,6 @@ namespace Camera
             public byte[] lastImage = new byte[0];
             override public void PostProcess()
             {
-                Console.WriteLine("Post Process hehehe " + this.WorkingData.Count());
                 lastImage = this.WorkingData.ToArray();
                 this.WorkingData.Clear();
             }
@@ -61,7 +60,7 @@ namespace Camera
                 cam.Camera.PreviewPort.ConnectTo(nullSink);
 
                 //Task.Delay(2000).Wait();
-                CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(200));
+                CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(100));
 
                 cam.ProcessAsync(cam.Camera.VideoPort, cts.Token).Wait();
                 return imgCaptureHandler.lastImage;
