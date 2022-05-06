@@ -47,6 +47,7 @@ namespace PiController
                 var bytes = camera.Read();
                 long milliseconds = DateTimeOffset.Now.ToUnixTimeMilliseconds();
                 File.WriteAllBytes("run-" + milliseconds + ".jpg", bytes);
+                Thread.Sleep(delay);
             }
             Console.WriteLine("Finishing Record Mode");
 
