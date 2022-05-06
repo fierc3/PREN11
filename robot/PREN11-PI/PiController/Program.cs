@@ -4,6 +4,7 @@ using System.IO;
 using Camera;
 using OpenCvSharp;
 using QrCodeDetection;
+using System.Threading;
 
 namespace PiController
 {
@@ -39,13 +40,14 @@ namespace PiController
             ICameraModule camera = input == 0 ? new WebCameraModule() : new CameraPiModule();
             camera.Init();
             Console.WriteLine("Images will be saved under: " + Path.GetFullPath("run-xxxxx.jgp"));
-            Console.WriteLine($"Delay Between Images:{delay}, Capture count: {max}");
-            for(int i = 0; i < 100; i++)
+            Console.WriteLine($"Delay Between Images:{delay}ms, Capture count: {max}");
+            for(int i = 0; i < max; i++)
             {
                 Console.WriteLine("Saving Image " + i);
                 var bytes = camera.Read();
                 long milliseconds = DateTimeOffset.Now.ToUnixTimeMilliseconds();
                 File.WriteAllBytes("run-" + milliseconds + ".jpg", bytes);
+                Thread.Sleep(2000);
 
             }
             Console.WriteLine("Finishing Record Mode");
