@@ -18,8 +18,17 @@ namespace Camera
     public class CameraPiModule : ICameraModule
     {
         MMALCamera cam;
-        InMemoryCaptureHandler imgCaptureHandler = new InMemoryCaptureHandler();
+        //InMemoryCaptureHandler imgCaptureHandler = new InMemoryCaptureHandler();
         byte[] lastImage = new byte[0];
+
+        class CustomInMemoryCaptureHandler : InMemoryCaptureHandler
+        {
+            override public void PostProcess()
+            {
+                Console.WriteLine("Post Process hehehe " + this.WorkingData.Count());
+                this.WorkingData.Clear();
+            }
+        }
 
         public void Init()
         {
@@ -31,7 +40,7 @@ namespace Camera
 
              cam = MMALCamera.Instance;
 
-            // using (var imgCaptureHandler = new InMemoryCaptureHandler())
+            using (var imgCaptureHandler = new CustomInMemoryCaptureHandler())
             using (var splitter = new MMALSplitterComponent())
             using (var imgEncoder = new MMALImageEncoder(continuousCapture: true))
             using (var nullSink = new MMALNullSinkComponent())
@@ -39,6 +48,7 @@ namespace Camera
                 cam.ConfigureCameraSettings();
 
                 var portConfig = new MMALPortConfig(MMALEncoding.JPEG, MMALEncoding.I420, quality: 50);
+
 
                 // Create our component pipeline.         
                 imgEncoder.ConfigureOutputPort(portConfig, imgCaptureHandler);
@@ -48,10 +58,9 @@ namespace Camera
                 cam.Camera.PreviewPort.ConnectTo(nullSink);
 
 
-                //CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(1000));
+                CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(250));
 
-                cam.ProcessAsync(cam.Camera.VideoPort).Wait();//cts.Token
-                lastImage = imgCaptureHandler.WorkingData.ToArray();
+                cam.ProcessAsync(cam.Camera.VideoPort, cts.Token);
 
             }
         }
