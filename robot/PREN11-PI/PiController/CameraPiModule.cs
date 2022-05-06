@@ -18,6 +18,7 @@ namespace Camera
     public class CameraPiModule : ICameraModule
     {
         MMALCamera cam;
+        var imgCaptureHandler = new InMemoryCaptureHandler()
 
         public void Init()
         {
@@ -28,8 +29,11 @@ namespace Camera
             MMALCameraConfig.StillBurstMode = true;
 
              cam = MMALCamera.Instance;
+        }
 
-            using (var imgCaptureHandler = new InMemoryCaptureHandler())
+        public byte[] Read()
+        {
+           // using (var imgCaptureHandler = new InMemoryCaptureHandler())
             using (var splitter = new MMALSplitterComponent())
             using (var imgEncoder = new MMALImageEncoder(continuousCapture: true))
             using (var nullSink = new MMALNullSinkComponent())
@@ -44,20 +48,13 @@ namespace Camera
                 cam.Camera.VideoPort.ConnectTo(splitter);
                 splitter.Outputs[0].ConnectTo(imgEncoder);
                 cam.Camera.PreviewPort.ConnectTo(nullSink);
-            }
-        }
 
-        public byte[] Read()
-        {
-            using (var imgCaptureHandler = new InMemoryCaptureHandler())
-            {
-                CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(500));
 
+                CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(1000));
+      
                 cam.ProcessAsync(cam.Camera.VideoPort, cts.Token).Wait();
                 return imgCaptureHandler.WorkingData.ToArray();
-
             }
-
         }
 
         public void Release()
