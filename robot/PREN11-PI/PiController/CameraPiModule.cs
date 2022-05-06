@@ -61,7 +61,7 @@ namespace Camera
                 cam.Camera.PreviewPort.ConnectTo(nullSink);
 
                 //Task.Delay(2000).Wait();
-                CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(1000));
+                CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(500));
 
                 cam.ProcessAsync(cam.Camera.VideoPort, cts.Token).Wait();
                 return imgCaptureHandler.lastImage;
