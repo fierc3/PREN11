@@ -28,10 +28,7 @@ namespace Camera
             MMALCameraConfig.StillBurstMode = true;
 
              cam = MMALCamera.Instance;
-        }
 
-        public byte[] Read()
-        {
             using (var imgCaptureHandler = new InMemoryCaptureHandler())
             using (var splitter = new MMALSplitterComponent())
             using (var imgEncoder = new MMALImageEncoder(continuousCapture: true))
@@ -47,13 +44,20 @@ namespace Camera
                 cam.Camera.VideoPort.ConnectTo(splitter);
                 splitter.Outputs[0].ConnectTo(imgEncoder);
                 cam.Camera.PreviewPort.ConnectTo(nullSink);
+            }
+        }
 
+        public byte[] Read()
+        {
+            using (var imgCaptureHandler = new InMemoryCaptureHandler())
+            {
+                CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(500));
 
-                CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(1));
-      
                 cam.ProcessAsync(cam.Camera.VideoPort, cts.Token).Wait();
                 return imgCaptureHandler.WorkingData.ToArray();
+
             }
+
         }
 
         public void Release()
