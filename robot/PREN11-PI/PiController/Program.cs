@@ -40,6 +40,8 @@ namespace PiController
             ICameraModule camera = input == 0 ? new WebCameraModule() : new CameraPiModule();
             camera.Init();
             Console.WriteLine("Images will be saved under: " + Path.GetFullPath("run-xxxxx.jgp"));
+            Console.WriteLine("Waiting for 2000ms in main thread for camera warm up");
+            Thread.Sleep(2000);
             Console.WriteLine($"Delay Between Images:{delay}ms, Capture count: {max}");
             for(int i = 0; i < max; i++)
             {
