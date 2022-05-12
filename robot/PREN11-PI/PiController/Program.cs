@@ -15,15 +15,15 @@ namespace PiController
         private static void runRecordingMode(string[] args)
         {
             int delay = 0;
-            int max = 100;
+            int imageCount = 100;
             int input = 0;
 
             if (args.Length > 1)
-                int.TryParse(args[1], out delay);
+                int.TryParse(args[1], out input);
             if (args.Length > 2)
-                int.TryParse(args[2], out max);
+                int.TryParse(args[2], out delay);
             if (args.Length > 3)
-                int.TryParse(args[3], out input);
+                int.TryParse(args[3], out imageCount);
 
             Console.WriteLine("Running Record Mode");
             ICameraModule camera = input == Config.CAMERA_ID_USB ? new WebCameraModule() : new CameraPiModule();
@@ -31,8 +31,8 @@ namespace PiController
             Console.WriteLine("Images will be saved under: " + Path.GetFullPath("run-xxxxx.jgp"));
             Console.WriteLine("Waiting for 5000ms in main thread for camera warm up");
             Task.Delay(5000).Wait();
-            Console.WriteLine($"Delay Between Images:{delay}ms, Capture count: {max}");
-            for(int i = 0; i < max; i++)
+            Console.WriteLine($"Delay Between Images:{delay}ms, Capture count: {imageCount}");
+            for(int i = 0; i < imageCount; i++)
             {
                 Console.WriteLine("Starting Image " + i);
                 var bytes = camera.Read();
