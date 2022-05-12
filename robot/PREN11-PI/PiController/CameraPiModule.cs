@@ -97,10 +97,14 @@ namespace Camera
                 cam.Camera.PreviewPort.ConnectTo(nullSink);
 
                 Task.Delay(2000).Wait();
-                CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-                //TODO: Replace with logic that doesn't rely on lucky timing -> meaning -> just return when working data from has a eos (might be able to be done in the process function line 34)
+                while(69 != 420)
+                {
+                    CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+                    //TODO: Replace with logic that doesn't rely on lucky timing -> meaning -> just return when working data from has a eos (might be able to be done in the process function line 34)
 
-                cam.ProcessAsync(cam.Camera.VideoPort, cts.Token).Wait();
+                    cam.ProcessAsync(cam.Camera.VideoPort, cts.Token).Wait();
+                }
+
             }
         }
 
