@@ -27,7 +27,10 @@ namespace Camera
 
             public byte[] GetLastImage()
             {
-                Console.WriteLine(lastImage.Length);
+                if(lastImage.Length < WorkingData.ToArray().Count())
+                {
+                    return WorkingData.ToArray();
+                }
                 return lastImage;
             }
 
