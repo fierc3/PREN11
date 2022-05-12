@@ -68,7 +68,7 @@ namespace Camera
             MMALCameraConfig.VideoStabilisation = true;
 
             MMALCameraConfig.StillFramerate = new MMAL_RATIONAL_T(20, 1); // Set to 20fps. Default is 30fps.
-            MMALCameraConfig.ShutterSpeed = 200000; //2000000; // Set to 2s exposure time. Default is 0 (auto).
+            MMALCameraConfig.ShutterSpeed = 50000; //2000000; // Set to 2s exposure time. Default is 0 (auto).
             MMALCameraConfig.ISO = 400;
             MMALCameraConfig.StillBurstMode = true;
 
