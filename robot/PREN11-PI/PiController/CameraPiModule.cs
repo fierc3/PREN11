@@ -40,10 +40,11 @@ namespace Camera
                 // stored in the "WorkingData" property plus the data found in the "data" parameter indicates you have a full image frame.
 
                 // The call to base.Process will add the data to the WorkingData list.
-                WorkingData.AddRange(ctx.Data);
-                Console.WriteLine("wd " + WorkingData.Count());
+                //WorkingData.AddRange(ctx.Data);
+                Console.WriteLine("pre wd " + WorkingData.Count());
                 Console.WriteLine("ctx " + ctx.Data.Count());
-                //base.Process(ctx);
+                base.Process(ctx);
+                Console.WriteLine("postwd " + WorkingData.Count());
 
                 if (ctx.Eos)
                 {
