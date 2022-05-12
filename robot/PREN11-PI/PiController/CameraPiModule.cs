@@ -31,14 +31,6 @@ namespace Camera
                 return lastImage;
             }
 
-            private byte[] concatArrays(byte[] x, byte[] y)
-            {
-                var z = new byte[x.Length + y.Length];
-                x.CopyTo(z, 0);
-                y.CopyTo(z, x.Length);
-                return z;
-            }
-
             public override void Process(ImageContext ctx)
             {
                 // The InMemoryCaptureHandler parent class has a property called "WorkingData". 
@@ -51,7 +43,7 @@ namespace Camera
                 WorkingData.AddRange(ctx.Data);
                 Console.WriteLine("wd " + WorkingData.Count());
                 Console.WriteLine("ctx " + ctx.Data.Count());
-                base.Process(ctx);
+                //base.Process(ctx);
 
                 if (ctx.Eos)
                 {
