@@ -146,7 +146,7 @@ namespace PiController
         {
             int program = 0;
             if (args.Length > 0)
-                int.TryParse(args[1], out program);
+                int.TryParse(args[0], out program);
             if(program == 0)
             {
                 runRecordingMode(args);
