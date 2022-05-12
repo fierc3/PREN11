@@ -37,18 +37,13 @@ namespace PiController
                 Console.WriteLine("Starting Image " + i);
                 var bytes = camera.Read();
                 Console.WriteLine("Read Image " + i);
-                SaveImageAsUniqueFile(bytes);
+                Utils.SaveImageAsUniqueFile(bytes);
                 Task.Delay(delay).Wait();
             }
             Console.WriteLine("Finishing Record Mode");
 
         }
 
-        private static void SaveImageAsUniqueFile(byte[] bytes)
-        {
-            long milliseconds = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            File.WriteAllBytesAsync("run-" + milliseconds + ".jpg", bytes);
-        }
 
         private static void runParcour(string[] args)
         {
@@ -79,7 +74,7 @@ namespace PiController
                         serverCommunicator = new ServerCommunicator(Config.URL_SERVERSOCKET);
                     }
                     //set which camera module to use
-                    detector.Init( camera);
+                    detector.Init(camera);
                     Console.WriteLine("Waiting for 5000ms in main thread for camera warm up");
                     Task.Delay(5000).Wait();
                     Console.WriteLine("Setting up Server Communicator");
@@ -102,6 +97,11 @@ namespace PiController
                     var latestValue = detector.DetectUniqueCode();
                     // process value
                     end = (latestValue.text.Equals("end"));
+                    if(offline == 0) //is offline true? 
+                    {
+                        Console.WriteLine("Offline --> saving image locally");
+                        Utils.SaveImageAsUniqueFile(latestValue.image.ToBytes());
+                    }
                     if (end == false && latestValue.text.Contains("plant"))
                     {
                         //send to plantId
@@ -113,10 +113,6 @@ namespace PiController
                             // Send Result to Webserver via socket.io
                             Console.WriteLine("Sending found plant via socket: " + plantIdResult);
                             serverCommunicator.SendPlant(plantIdResult);
-                        }
-                        else
-                        {
-                            SaveImageAsUniqueFile(latestValue.image.ToBytes());
                         }
                     }
                 }
