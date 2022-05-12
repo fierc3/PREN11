@@ -18,7 +18,7 @@ namespace Camera
     public class CameraPiModule : ICameraModule
     {
         MMALCamera cam;
-        MyInMemoryCaptureHandler imgCaptureHandler = new MyInMemoryCaptureHandler();
+        static MyInMemoryCaptureHandler imgCaptureHandler = new MyInMemoryCaptureHandler();
 
         public class MyInMemoryCaptureHandler : InMemoryCaptureHandler
         {
@@ -27,6 +27,7 @@ namespace Camera
 
             public byte[] GetLastImage()
             {
+                Console.WriteLine("ReadingLastImage: " + lastImage.Length);
                 if(lastImage.Length < WorkingData.ToArray().Count())
                 {
                     return WorkingData.ToArray();
@@ -74,9 +75,10 @@ namespace Camera
             MMALCameraConfig.StillBurstMode = true;
 
             cam = MMALCamera.Instance;
+            initVideoPort();
         }
 
-        public byte[] Read()
+        private void initVideoPort()
         {
             using (var splitter = new MMALSplitterComponent())
             using (var imgEncoder = new MMALImageEncoder(continuousCapture: true))
@@ -95,12 +97,17 @@ namespace Camera
                 cam.Camera.PreviewPort.ConnectTo(nullSink);
 
                 //Task.Delay(2000).Wait();
-                CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(250));
+                //CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(250));
                 //TODO: Replace with logic that doesn't rely on lucky timing -> meaning -> just return when working data from has a eos (might be able to be done in the process function line 34)
 
-                cam.ProcessAsync(cam.Camera.VideoPort, cts.Token).Wait();
-                return imgCaptureHandler.GetLastImage();
+                cam.ProcessAsync(cam.Camera.VideoPort);
+                
             }
+        }
+
+        public byte[] Read()
+        {
+            return imgCaptureHandler.GetLastImage();
         }
 
         public void Release()
