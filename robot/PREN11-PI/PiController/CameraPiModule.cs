@@ -27,7 +27,6 @@ namespace Camera
 
             public byte[] GetLastImage()
             {
-                Console.WriteLine("ReadingLastImage: " + lastImage.Length);
                 if(lastImage.Length < WorkingData.ToArray().Count())
                 {
                     return WorkingData.ToArray();
@@ -47,18 +46,13 @@ namespace Camera
 
                 // The call to base.Process will add the data to the WorkingData list.
                 //WorkingData.AddRange(ctx.Data);
-                Console.WriteLine("pre wd " + WorkingData.Count());
-                Console.WriteLine("ctx " + ctx.Data.Count());
                 base.Process(ctx);
-                Console.WriteLine("postwd " + WorkingData.Count());
-
                 if (ctx.Eos)
                 {
 
                     lastImage = WorkingData.ToArray();
                     Console.WriteLine("I have a full frame. Clearing working data.");
                     this.WorkingData.Clear();
-
                 }
             }
         }
