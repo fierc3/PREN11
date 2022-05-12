@@ -23,7 +23,6 @@ namespace Camera
         public class MyInMemoryCaptureHandler : InMemoryCaptureHandler
         {
             public static byte[] lastImage = new byte[0];
-            private static object syncObj = new object();
 
             public byte[] GetLastImage()
             {
@@ -51,7 +50,7 @@ namespace Camera
                 {
 
                     lastImage = WorkingData.ToArray();
-                    Console.WriteLine("I have a full frame. Clearing working data.");
+                    Console.Write("(ff)");
                     this.WorkingData.Clear();
                 }
             }
