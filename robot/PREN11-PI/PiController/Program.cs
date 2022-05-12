@@ -5,6 +5,7 @@ using Camera;
 using OpenCvSharp;
 using QrCodeDetection;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace PiController
 {
@@ -41,7 +42,7 @@ namespace PiController
             camera.Init();
             Console.WriteLine("Images will be saved under: " + Path.GetFullPath("run-xxxxx.jgp"));
             Console.WriteLine("Waiting for 5000ms in main thread for camera warm up");
-            Thread.Sleep(5000);
+            Task.Delay(5000).Wait();
             Console.WriteLine($"Delay Between Images:{delay}ms, Capture count: {max}");
             for(int i = 0; i < max; i++)
             {
@@ -50,7 +51,7 @@ namespace PiController
                 Console.WriteLine("Read Image " + i);
                 long milliseconds = DateTimeOffset.Now.ToUnixTimeMilliseconds();
                 File.WriteAllBytesAsync("run-" + milliseconds + ".jpg", bytes);
-                Thread.Sleep(delay);
+                Task.Delay(delay).Wait();
             }
             Console.WriteLine("Finishing Record Mode");
 
