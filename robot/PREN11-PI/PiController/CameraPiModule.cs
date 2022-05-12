@@ -51,9 +51,9 @@ namespace Camera
                     lock (syncObj)
                     {
                         lastImage = this.WorkingData.ToArray();
+                        Console.WriteLine("I have a full frame. Clearing working data.");
+                        this.WorkingData.Clear();
                     }
-                    Console.WriteLine("I have a full frame. Clearing working data.");
-                    this.WorkingData.Clear();
                 }
             }
         }
