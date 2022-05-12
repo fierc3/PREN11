@@ -101,7 +101,7 @@ namespace Camera
                 //TODO: Replace with logic that doesn't rely on lucky timing -> meaning -> just return when working data from has a eos (might be able to be done in the process function line 34)
 
                 cam.ProcessAsync(cam.Camera.VideoPort, cts.Token);
-                
+                Task.Delay(3000).Wait();
             }
         }
 
