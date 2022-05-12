@@ -33,27 +33,29 @@ namespace Camera
 
             public override void Process(ImageContext ctx)
             {
-                // The InMemoryCaptureHandler parent class has a property called "WorkingData". 
-                // It is your responsibility to look after the clearing of this property.
 
-                // The "eos" parameter indicates whether the MMAL buffer has an EOS parameter, if so, the data that's currently
-                // stored in the "WorkingData" property plus the data found in the "data" parameter indicates you have a full image frame.
-
-                // The call to base.Process will add the data to the WorkingData list.
-                //WorkingData.AddRange(ctx.Data);
-                Console.WriteLine("pre wd " + WorkingData.Count());
-                Console.WriteLine("ctx " + ctx.Data.Count());
-                base.Process(ctx);
-                Console.WriteLine("postwd " + WorkingData.Count());
-
-                if (ctx.Eos)
+                lock (syncObj)
                 {
+                    // The InMemoryCaptureHandler parent class has a property called "WorkingData". 
+                    // It is your responsibility to look after the clearing of this property.
 
-                    lock (syncObj)
+                    // The "eos" parameter indicates whether the MMAL buffer has an EOS parameter, if so, the data that's currently
+                    // stored in the "WorkingData" property plus the data found in the "data" parameter indicates you have a full image frame.
+
+                    // The call to base.Process will add the data to the WorkingData list.
+                    //WorkingData.AddRange(ctx.Data);
+                    Console.WriteLine("pre wd " + WorkingData.Count());
+                    Console.WriteLine("ctx " + ctx.Data.Count());
+                    base.Process(ctx);
+                    Console.WriteLine("postwd " + WorkingData.Count());
+
+                    if (ctx.Eos)
                     {
+
                         lastImage = WorkingData.ToArray();
                         Console.WriteLine("I have a full frame. Clearing working data.");
                         this.WorkingData.Clear();
+
                     }
                 }
             }
