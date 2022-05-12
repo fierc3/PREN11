@@ -104,7 +104,7 @@ namespace PiController
                     if (end == false && latestValue.text.Contains("plant"))
                     {
                         //send to plantId
-                        if (offline == 2) //Online Mode check
+                        if (offline == 1) //Online Mode check
                         {
                             Console.WriteLine("Running in Online Mode, preparing to send image to plantId");
                             var imageBytes = latestValue.image.ToBytes();
