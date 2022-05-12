@@ -83,7 +83,7 @@ namespace Camera
             using (var nullSink = new MMALNullSinkComponent())
             {
                 cam.ConfigureCameraSettings();
-
+                /*
                 var portConfig = new MMALPortConfig(MMALEncoding.JPEG, MMALEncoding.I420, quality: 50);
 
 
@@ -98,7 +98,7 @@ namespace Camera
                 CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(250)); 
                 //TODO: Replace with logic that doesn't rely on lucky timing -> meaning -> just return when working data from has a eos (might be able to be done in the process function line 34)
 
-                cam.ProcessAsync(cam.Camera.VideoPort, cts.Token).Wait();
+                cam.ProcessAsync(cam.Camera.VideoPort, cts.Token).Wait();*/
                 cam.TakePicture(memoryHandler, MMALEncoding.JPEG, MMALEncoding.I420).Wait();
                 return memoryHandler.WorkingData.ToArray();
             }
