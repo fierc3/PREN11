@@ -78,10 +78,11 @@ namespace PiController
                     {
                         serverCommunicator = new ServerCommunicator(Config.URL_SERVERSOCKET);
                     }
-                    //set if should visualize  and which camera module to use
+                    //set which camera module to use
                     detector.Init( camera);
+                    Console.WriteLine("Waiting for 5000ms in main thread for camera warm up");
+                    Task.Delay(5000).Wait();
                     Console.WriteLine("Setting up Server Communicator");
-
                 }
                 catch (Exception ex)
                 {
