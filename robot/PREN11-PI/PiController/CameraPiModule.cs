@@ -34,29 +34,27 @@ namespace Camera
             public override void Process(ImageContext ctx)
             {
 
-                lock (syncObj)
+
+                // The InMemoryCaptureHandler parent class has a property called "WorkingData". 
+                // It is your responsibility to look after the clearing of this property.
+
+                // The "eos" parameter indicates whether the MMAL buffer has an EOS parameter, if so, the data that's currently
+                // stored in the "WorkingData" property plus the data found in the "data" parameter indicates you have a full image frame.
+
+                // The call to base.Process will add the data to the WorkingData list.
+                //WorkingData.AddRange(ctx.Data);
+                Console.WriteLine("pre wd " + WorkingData.Count());
+                Console.WriteLine("ctx " + ctx.Data.Count());
+                base.Process(ctx);
+                Console.WriteLine("postwd " + WorkingData.Count());
+
+                if (ctx.Eos)
                 {
-                    // The InMemoryCaptureHandler parent class has a property called "WorkingData". 
-                    // It is your responsibility to look after the clearing of this property.
 
-                    // The "eos" parameter indicates whether the MMAL buffer has an EOS parameter, if so, the data that's currently
-                    // stored in the "WorkingData" property plus the data found in the "data" parameter indicates you have a full image frame.
+                    lastImage = WorkingData.ToArray();
+                    Console.WriteLine("I have a full frame. Clearing working data.");
+                    this.WorkingData.Clear();
 
-                    // The call to base.Process will add the data to the WorkingData list.
-                    //WorkingData.AddRange(ctx.Data);
-                    Console.WriteLine("pre wd " + WorkingData.Count());
-                    Console.WriteLine("ctx " + ctx.Data.Count());
-                    base.Process(ctx);
-                    Console.WriteLine("postwd " + WorkingData.Count());
-
-                    if (ctx.Eos)
-                    {
-
-                        lastImage = WorkingData.ToArray();
-                        Console.WriteLine("I have a full frame. Clearing working data.");
-                        this.WorkingData.Clear();
-
-                    }
                 }
             }
         }
@@ -68,7 +66,7 @@ namespace Camera
             MMALCameraConfig.VideoStabilisation = true;
 
             MMALCameraConfig.StillFramerate = new MMAL_RATIONAL_T(20, 1); // Set to 20fps. Default is 30fps.
-            MMALCameraConfig.ShutterSpeed = 50000; //2000000; // Set to 2s exposure time. Default is 0 (auto).
+            MMALCameraConfig.ShutterSpeed = 200000; //2000000; // Set to 2s exposure time. Default is 0 (auto).
             MMALCameraConfig.ISO = 400;
             MMALCameraConfig.StillBurstMode = true;
 
@@ -77,13 +75,12 @@ namespace Camera
 
         public byte[] Read()
         {
-            using (var memoryHandler = new InMemoryCaptureHandler())
             using (var splitter = new MMALSplitterComponent())
             using (var imgEncoder = new MMALImageEncoder(continuousCapture: true))
             using (var nullSink = new MMALNullSinkComponent())
             {
                 cam.ConfigureCameraSettings();
-                /*
+
                 var portConfig = new MMALPortConfig(MMALEncoding.JPEG, MMALEncoding.I420, quality: 50);
 
 
@@ -95,12 +92,11 @@ namespace Camera
                 cam.Camera.PreviewPort.ConnectTo(nullSink);
 
                 //Task.Delay(2000).Wait();
-                CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(250)); 
+                CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(250));
                 //TODO: Replace with logic that doesn't rely on lucky timing -> meaning -> just return when working data from has a eos (might be able to be done in the process function line 34)
 
-                cam.ProcessAsync(cam.Camera.VideoPort, cts.Token).Wait();*/
-                cam.TakePicture(memoryHandler, MMALEncoding.JPEG, MMALEncoding.I420).Wait();
-                return memoryHandler.WorkingData.ToArray();
+                cam.ProcessAsync(cam.Camera.VideoPort, cts.Token).Wait();
+                return imgCaptureHandler.GetLastImage();
             }
         }
 
