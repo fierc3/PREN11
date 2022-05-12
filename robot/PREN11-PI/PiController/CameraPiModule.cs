@@ -77,6 +77,7 @@ namespace Camera
 
         public byte[] Read()
         {
+            using (var memoryHandler = new InMemoryCaptureHandler())
             using (var splitter = new MMALSplitterComponent())
             using (var imgEncoder = new MMALImageEncoder(continuousCapture: true))
             using (var nullSink = new MMALNullSinkComponent())
@@ -98,7 +99,8 @@ namespace Camera
                 //TODO: Replace with logic that doesn't rely on lucky timing -> meaning -> just return when working data from has a eos (might be able to be done in the process function line 34)
 
                 cam.ProcessAsync(cam.Camera.VideoPort, cts.Token).Wait();
-                return imgCaptureHandler.GetLastImage();
+                cam.TakePicture(memoryHandler, MMALEncoding.JPEG, MMALEncoding.I420).Wait();
+                return memoryHandler.WorkingData.ToArray();
             }
         }
 
