@@ -16,25 +16,23 @@ namespace QrCodeDetection
 
         List<Code> codes = new List<Code>();
 
-        ICameraModule videoCapture;
-        bool visualizeDetection = true;
+        ICameraModule cam;
 
-        public void Init(bool visualize, ICameraModule camera)
+        public void Init(ICameraModule camera)
         {
-            this.visualizeDetection = visualize;
-            videoCapture = camera;
-            videoCapture.Init();
+            cam = camera;
+            cam.Init();
         }
         public void Release()
         {
-            videoCapture.Release();
+            cam.Release();
             Cv2.DestroyAllWindows();
         }
 
         private Mat GrabFrame()
         {
             Mat image = new Mat();
-            var bytes = videoCapture.Read();
+            var bytes = cam.Read();
             //Mat(int rows, int cols, MatType type, Array data
             return Mat.FromImageData(bytes);
         }
@@ -97,25 +95,16 @@ namespace QrCodeDetection
                 if (image.Empty())
                     continue;
 
-                if (visualizeDetection)
-                {
-                    MarkFeatures(image);
-                    Cv2.ImShow("frame", image);
-                    if (Cv2.WaitKey(1) == (int)ConsoleKey.Enter)
-                        break;
-                }
-                System.Threading.Thread.Sleep(500);
+               //System.Threading.Thread.Sleep(500);
             }
 
             var croppedImage = CropImageForPlant(image); //TODO: Fix cropping as suggested in docs
             //image.Dispose();
 
             //display result
-            if (image != null && visualizeDetection)
+            if (image != null)
             {
-
                 image = croppedImage;
-                Cv2.ImShow("frame", image);
             }
             return (text: finalResult, image: image);
         }
