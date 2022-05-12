@@ -96,7 +96,7 @@ namespace Camera
                 splitter.Outputs[0].ConnectTo(imgEncoder);
                 cam.Camera.PreviewPort.ConnectTo(nullSink);
 
-                //Task.Delay(2000).Wait();
+                Task.Delay(2000).Wait();
                 //CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(250));
                 //TODO: Replace with logic that doesn't rely on lucky timing -> meaning -> just return when working data from has a eos (might be able to be done in the process function line 34)
 
