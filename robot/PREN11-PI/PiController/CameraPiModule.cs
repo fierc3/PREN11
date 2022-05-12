@@ -31,6 +31,14 @@ namespace Camera
                 return lastImage;
             }
 
+            private byte[] concatArrays(byte[] x, byte[] y)
+            {
+                var z = new byte[x.Length + y.Length];
+                x.CopyTo(z, 0);
+                y.CopyTo(z, x.Length);
+                return z;
+            }
+
             public override void Process(ImageContext ctx)
             {
                 // The InMemoryCaptureHandler parent class has a property called "WorkingData". 
@@ -50,7 +58,7 @@ namespace Camera
 
                     lock (syncObj)
                     {
-                        lastImage = this.WorkingData.ToArray();
+                        lastImage = concatArrays(ctx.Data, WorkingData.ToArray());
                         Console.WriteLine("I have a full frame. Clearing working data.");
                         this.WorkingData.Clear();
                     }
