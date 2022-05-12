@@ -31,7 +31,6 @@ namespace QrCodeDetection
 
         private Mat GrabFrame()
         {
-            Mat image = new Mat();
             var bytes = cam.Read();
             //Mat(int rows, int cols, MatType type, Array data
             return Mat.FromImageData(bytes);
