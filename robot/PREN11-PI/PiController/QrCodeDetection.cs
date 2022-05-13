@@ -2,7 +2,6 @@
 using OpenCvSharp;
 using PiController;
 using System;
-using System.Collections.Generic;
 
 namespace QrCodeDetection
 {
@@ -15,7 +14,7 @@ namespace QrCodeDetection
             public RotatedRect Area { get; set; }
         }
 
-        List<Code> codes = new List<Code>();
+        int previousX = 0;
 
         ICameraModule cam;
 
@@ -33,7 +32,6 @@ namespace QrCodeDetection
         private Mat GrabFrame()
         {
             var bytes = cam.Read();
-            //Mat(int rows, int cols, MatType type, Array data
             return Mat.FromImageData(bytes);
         }
 
@@ -51,16 +49,7 @@ namespace QrCodeDetection
             rect.Width = rect.Width - edge * 2;
             rect.X = rect.X + edge;
             var cropped = new Mat(gray, rect);
-            //Utils.SaveImageAsUniqueFile(cropped.ToBytes());
             return cropped;
-        }
-
-        private void MarkFeatures(Mat image)
-        {
-            foreach(var code in codes)
-            {
-                Cv2.Rectangle(image, code.Area.BoundingRect(), new Scalar(0, 255, 0), thickness: 1);
-            }
         }
 
         /// <summary>
@@ -81,9 +70,7 @@ namespace QrCodeDetection
                 image = GrabFrame();
                 //Convert to gray scale to improve the image processing
                 Mat gray = ConvertGrayScale(image);
-                //
-                //TODO: Crop between 25% and 50%
-                //
+                //Crop image to 25% - 75%, center focused
                 Mat cropped = CropWidthToCenter(gray);
                 gray.Dispose();
                 var detector = new QRCodeDetector();
@@ -92,28 +79,28 @@ namespace QrCodeDetection
                 cropped.Dispose();
                 if (result.Length > 1)
                 {
-                    if(codes.FindIndex(x => x.Value.Equals(result)) >= 0){
+                    var currentX = Cv2.BoundingRect(points).X;
+                    if (previousX > currentX){
                         //is a duplicate
-                        Console.WriteLine("found dupe result: " + result);
+                        Console.WriteLine("found suspected dupe, because previous x > current x: " + result);
                     }
                     else
                     {
                         Console.WriteLine("result: " + result);
                         qrRectangle = Cv2.BoundingRect(points);
-                        //codes.Add(new Code() { Area = rect, Value = result });
                         finalResult = result;
                     }
+                    previousX = currentX;
                 }
 
                 if (image.Empty())
                     continue;
-
-               //System.Threading.Thread.Sleep(500);
             }
 
             if(qrRectangle.HasValue)
             {
-               var croppedImage = CropImageForPlant(image, qrRectangle.Value); //TODO: Fix cropping as suggested in docs
+                //Try to crop around plant
+               var croppedImage = CropImageForPlant(image, qrRectangle.Value);
                 if (image != null)
                 {
                     image = croppedImage;
@@ -127,18 +114,26 @@ namespace QrCodeDetection
 
         private Mat CropImageForPlant(Mat image, Rect boundRect)
         {
-            Utils.SaveImageAsUniqueFile(image.ToBytes());
-            Mat gray = new Mat();
-            Cv2.CvtColor(image, gray, ColorConversionCodes.BGR2GRAY);
+            try
+            {
+                Utils.SaveImageAsUniqueFile(image.ToBytes());
+                Mat gray = new Mat();
+                Cv2.CvtColor(image, gray, ColorConversionCodes.BGR2GRAY);
 
-            var iRect = gray.BoundingRect();
-            iRect.Width = boundRect.Width * 2;
-            iRect.X = (image.Width / 100 * 25) +boundRect.X - (boundRect.Width/2);
+                var iRect = gray.BoundingRect();
+                iRect.Width = boundRect.Width * 2;
+                iRect.X = (image.Width / 100 * 25) + boundRect.X - (boundRect.Width / 2);
 
-            var cropped = new Mat(image, iRect);
-            //image.Dispose();
-            Utils.SaveImageAsUniqueFile(cropped.ToBytes());
-            return cropped;
+                var cropped = new Mat(image, iRect);
+                //image.Dispose();
+                Utils.SaveImageAsUniqueFile(cropped.ToBytes());
+                return cropped;
+            }
+            catch (Exception ex) {
+                Console.WriteLine("Failed to crop: " + ex.Message);
+                return image;
+            }
+
         }
     }
 }
