@@ -42,11 +42,20 @@ const Guest = () => {
     const [startDate, setStartDate] = React.useState("")
     const [toast, setToast] = React.useState(false)
     const [toastText, setToastText] = React.useState(false)
+    const [progress, setProgress] =  React.useState(0);
 
     const updateMetaData = (event) => {
         setRun(event.run);
         let date = new Date(event.datetime).toLocaleString();
         setStartDate("Run started at " + date);
+    }
+
+    const updateProgress=(events)=>{
+        if(events.find(x => x.event_type === 3)){
+            setProgress(100)
+            return;
+        }
+        setProgress(events.length  / (events.length + 3)* 100);
     }
 
     const connect = () => {
@@ -60,21 +69,27 @@ const Guest = () => {
             }
             if (json.event_type === 1) {
                 setToastText("New Run Started!")
+                setProgress(1);
             } else if (json.event_type === 2) {
                 const plant = JSON.parse(json.event_value);
                 setToastText(`Found ${plant.plantName}!`)
+                updateProgress(data);
             } else if (json.event_type === 3) {
                 setToastText("Run has finished")
+                setProgress(100)
             }
             setToast(true)
 
         });
     }
 
+
     const updateData = async () => {
         const response = await fetch(ENDPOINT + "/api/currentRun");
         const json = await response.json();
         setData(json);
+        console.log(json)
+        updateProgress(json)
         if (json.length > 0) {
             updateMetaData(json[0])
         }
@@ -142,7 +157,7 @@ const Guest = () => {
                 >
                     <Alert severity="success">{toastText}</Alert>
                 </Snackbar>
-                <Footer />
+                <Footer progress={progress.toFixed(2)} />
             </ThemeProvider>
         </>
     );
