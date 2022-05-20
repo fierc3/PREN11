@@ -6,6 +6,9 @@ using OpenCvSharp;
 using QrCodeDetection;
 using System.Threading;
 using System.Threading.Tasks;
+using System;
+using System.Device.Gpio;
+using System.Threading;
 
 namespace PiController
 {
@@ -141,6 +144,31 @@ namespace PiController
 
         static void Main(string[] args)
         {
+            Console.WriteLine("Starting test code");
+            //14 15 23 24
+            int outPin14 = 18;
+            int outPin15 = 15;
+            int outPin23 = 23;
+            int inPin24 = 24;
+            using var controller = new GpioController();
+            controller.OpenPin(outPin14, PinMode.Output);
+            controller.OpenPin(outPin15, PinMode.Output);
+            controller.OpenPin(outPin23, PinMode.Output);
+            controller.OpenPin(inPin24, PinMode.Input);
+            bool pinValue = true;
+            while (true)
+            {
+
+                controller.Write(outPin14, ((pinValue) ? PinValue.High : PinValue.Low));
+                controller.Write(outPin15, ((pinValue) ? PinValue.High : PinValue.Low));
+                controller.Write(outPin23, ((pinValue) ? PinValue.High : PinValue.Low));
+                Console.WriteLine("Switched pin value to " + pinValue);
+                Thread.Sleep(1000);
+                
+                pinValue = !pinValue;
+            }
+
+            return;
             int program = 0;
             if (args.Length > 0)
                 int.TryParse(args[0], out program);
