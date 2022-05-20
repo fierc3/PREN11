@@ -15,7 +15,7 @@ namespace PiController
 
     class Program
     {
-        private static void runRecordingMode(string[] args)
+        private static void RunRecordingMode(string[] args)
         {
             int delay = 0;
             int imageCount = 100;
@@ -48,7 +48,7 @@ namespace PiController
         }
 
 
-        private static void runParcour(string[] args)
+        private static void RunParcour(string[] args)
         {
             int input = 0;
             int offline = 0;
@@ -142,7 +142,7 @@ namespace PiController
             }
         }
 
-        static void Main(string[] args)
+        public static void RunTestPinMode()
         {
             Console.WriteLine("Starting test code");
             //14 15 23 24
@@ -164,20 +164,25 @@ namespace PiController
                 controller.Write(outPin23, ((pinValue) ? PinValue.High : PinValue.Low));
                 Console.WriteLine($"Switched pins {outPin14}, {outPin15}, {outPin23}, to {pinValue}");
                 Thread.Sleep(1000);
-                
+
                 pinValue = !pinValue;
             }
+        }
 
-            return;
+        static void Main(string[] args)
+        {
             int program = 0;
             if (args.Length > 0)
                 int.TryParse(args[0], out program);
             if(program == 0)
             {
-                runRecordingMode(args);
+                RunRecordingMode(args);
             }else if(program == 1)
             {
-                runParcour(args);
+                RunParcour(args);
+            }else if (program == 2)
+            {
+                RunTestPinMode();
             }
             
         }
