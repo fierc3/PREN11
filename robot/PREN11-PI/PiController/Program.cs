@@ -163,6 +163,8 @@ namespace PiController
                 controller.Write(outPin15, ((pinValue) ? PinValue.High : PinValue.Low));
                 controller.Write(outPin23, ((pinValue) ? PinValue.High : PinValue.Low));
                 Console.WriteLine($"Switched pins {outPin14}, {outPin15}, {outPin23}, to {pinValue}");
+                Console.WriteLine($"pins {inPin24}, {inPin24}, {outPin23}, to {pinValue}");
+                Console.WriteLine(controller.Read(inPin24));
                 Thread.Sleep(1000);
 
                 pinValue = !pinValue;
