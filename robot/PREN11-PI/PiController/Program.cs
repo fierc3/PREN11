@@ -150,10 +150,12 @@ namespace PiController
             int outPin15 = 15;
             int outPin23 = 23;
             int inPin24 = 24;
+            int startPin4 = 4;
             using var controller = new GpioController();
             controller.OpenPin(outPin14, PinMode.Output);
             controller.OpenPin(outPin15, PinMode.Output);
             controller.OpenPin(outPin23, PinMode.Output);
+            controller.OpenPin(startPin4, PinMode.Input);
             controller.OpenPin(inPin24, PinMode.Input);
             bool pinValue = true;
             while (true)
@@ -165,6 +167,7 @@ namespace PiController
                 Console.WriteLine($"Switched pins {outPin14}, {outPin15}, {outPin23}, to {pinValue}");
                 Console.WriteLine($"pins {inPin24}, {inPin24}, {outPin23}, to {pinValue}");
                 Console.WriteLine(controller.Read(inPin24));
+                Console.WriteLine("Starting?" + controller.Read(startPin4));
                 Thread.Sleep(1000);
 
                 pinValue = !pinValue;
