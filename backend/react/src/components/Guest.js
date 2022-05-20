@@ -12,6 +12,7 @@ import InProgressCard from './cards/InProgressCard';
 import PlantCard from './cards/PlantCard';
 import { getMainSocket } from './MainSocketSingleton';
 import socketIOClient from "socket.io-client";
+import useCheckMobileScreen from './Utils';
 
 
 var ENDPOINT = config.url.API_URL;
@@ -103,6 +104,13 @@ const Guest = () => {
 
     let firstPlantName = "";
 
+    /*
+    hint for mobile grid
+        align="center"
+    justify="center"
+    direction="column"
+    */
+
     return (
         <>
             <ThemeProvider theme={theme}>
@@ -116,8 +124,9 @@ const Guest = () => {
                         <Typography gutterBottom variant="caption" component="span" position={"absolute"} paddingLeft={"30px"} paddingTop={"75px"}>
                             {startDate}
                         </Typography>
-                        <Box sx={{ width: "90vw", marginTop: "100px", marginLeft: "50px" }}>
-                            <Grid container spacing={6}>
+                        <Box sx={{ width: "90vw", marginTop: "27vh", marginLeft: "50px" }}>
+                            <Grid container spacing={6} alignContent="center"direction={useCheckMobileScreen() ? "column": undefined} >
+                                
                                 {data.filter(event => event.event_type !== 1).map((event, index) => {
                                     const plant = JSON.parse(event.event_value);
                                     if (index === 0) {
