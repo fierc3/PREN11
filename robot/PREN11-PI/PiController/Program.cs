@@ -146,7 +146,7 @@ namespace PiController
         {
             Console.WriteLine("Starting test code");
             //14 15 23 24
-            int outPin14 = 18;
+            int outPin14 = 14;
             int outPin15 = 15;
             int outPin23 = 23;
             int inPin24 = 24;
