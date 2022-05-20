@@ -162,7 +162,7 @@ namespace PiController
                 controller.Write(outPin14, ((pinValue) ? PinValue.High : PinValue.Low));
                 controller.Write(outPin15, ((pinValue) ? PinValue.High : PinValue.Low));
                 controller.Write(outPin23, ((pinValue) ? PinValue.High : PinValue.Low));
-                Console.WriteLine("Switched pin value to " + pinValue);
+                Console.WriteLine($"Switched pins {outPin14}, {outPin15}, {outPin23}, to {pinValue}");
                 Thread.Sleep(1000);
                 
                 pinValue = !pinValue;
