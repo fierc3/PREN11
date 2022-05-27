@@ -1,20 +1,17 @@
 package com.pren11;
 
-
-import com.pren11.detector.QrCodeDetector;
 import com.pren11.modes.Parcour;
 import com.pren11.modes.Run;
-import com.pren11.server.PlantIdApiHandler;
-
-import javax.imageio.ImageIO;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.PrintStream;
 
 public class Program {
 
 
     public static void main(String[] args) throws Exception {
+        System.setOut(new PrintStream(new FileOutputStream("pren11-out.txt")));
+        System.setErr(new PrintStream(new FileOutputStream("pren11-err.txt")));
+        Config.updateByRelativeFile();
         Run mode = new Parcour();
         mode.run(args);
     }

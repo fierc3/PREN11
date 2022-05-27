@@ -40,6 +40,9 @@ public class Parcour implements Run{
                 out.println("Waiting for 5000ms in main thread for camera warm up");
                 TimeUnit.SECONDS.sleep(5);
                 out.println("Setting up Server Communicator");
+                out.println("Saving image for preview using settings: iso:"+Config.ISO + " shutterMs: " + Config.SHUTTERSPEED );
+
+                Utils.saveImageLocally(camera.read(),"preview_"+currentTimeMillis()+".jpg");
             }
             catch (Exception ex)
             {

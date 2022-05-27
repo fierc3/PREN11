@@ -81,7 +81,7 @@ public class PlantIdApiHandler {
                 .put("synonyms");
         data.put("plant_details", plantDetails);
 
-        var res = sendPostRequest("https://api.plant.id/v2/identify", data);
+        var res = sendPostRequest(Config.URL_PLANTID, data);
         JSONObject jsonObject = new JSONObject(res.trim());
         Iterator<String> keys = jsonObject.keys();
 

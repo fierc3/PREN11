@@ -32,9 +32,7 @@ public class QrCodeDetector {
     }
 
     private BufferedImage grabFrame(){
-        System.out.println("pre cam read");
         var bytes = cam.read();
-        System.out.println("post cam read");
         try {
             return Utils.toBufferedImage(bytes);
         } catch (IOException e) {

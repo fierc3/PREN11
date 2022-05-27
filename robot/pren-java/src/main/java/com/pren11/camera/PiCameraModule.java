@@ -1,10 +1,13 @@
 package com.pren11.camera;
 
+import com.pren11.Config;
 import uk.co.caprica.picam.ByteArrayPictureCaptureHandler;
 import uk.co.caprica.picam.Camera;
 import uk.co.caprica.picam.CameraConfiguration;
 import uk.co.caprica.picam.CaptureFailedException;
 import uk.co.caprica.picam.enums.Encoding;
+
+import static uk.co.caprica.picam.PicamNativeLibrary.installTempLibrary;
 
 public class PiCameraModule implements CameraModule{
 
@@ -12,12 +15,19 @@ public class PiCameraModule implements CameraModule{
 
     @Override
     public void init() {
+        // Extract the bundled picam native library to a temporary file and load it
+        try{
+            installTempLibrary();
+        }catch (Exception ex){
+            System.err.println("Failed to install picam native library");
+            ex.printStackTrace();
+        }
         var config = CameraConfiguration.cameraConfiguration()
                 .width(1920)
                 .height(1080)
                 .encoding(Encoding.JPEG)
-                .iso(100)
-                .shutterSpeed(1000)
+                .iso(Config.ISO)
+                .shutterSpeed(Config.SHUTTERSPEED)
                 .quality(80);
         try {
             cam = new Camera(config);
