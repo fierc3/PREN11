@@ -11,7 +11,7 @@ const PlantCard = (props) => {
     }
     return (<>
         {useCheckMobileScreen() ?
-        (undefined) :
+         <ArrowRightAltIcon sx={{ zIndex: -11, marginLeft: "50px", marginTop: "169px", position: "absolute", transform: "scale(3,2)  rotate(90deg)", color: "purple", opacity: "0.3" }} />:
         <ArrowRightAltIcon sx={{ zIndex: -11, marginLeft: "clamp(132px, 10.5vw, 200px)", marginTop: "70px", position: "absolute", transform: "scale(3,2)", color: "purple", opacity: "0.3" }} />
         }
         <Card sx={{ width: "10vw", minWidth: "120px", maxWidth: "190px", border: props.found === true ? 'red 1px solid' : undefined }}>
