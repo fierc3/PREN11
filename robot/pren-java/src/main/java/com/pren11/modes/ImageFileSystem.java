@@ -22,7 +22,7 @@ public class ImageFileSystem implements Run{
                 e.printStackTrace();
             }
             var detector = new QrCodeDetector();
-            var result = detector.readQrCode(bufferedImage);
+            var result = detector.readQrCode(bufferedImage,bufferedImage);
             var image = result.getImage();
             if(image.length > 0){
                 File outputFile = new File("cropped_"+path);

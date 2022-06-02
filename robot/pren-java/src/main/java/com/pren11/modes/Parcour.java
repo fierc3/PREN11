@@ -18,7 +18,7 @@ public class Parcour implements Run{
 
     @Override
     public void run (String[] args) {
-        //Speedometer.getInstance().fullStop();
+        if(Config.USE_CAMERA == Config.CAMERA_ID_PI)Speedometer.getInstance().fullStop();
         out.println("++++++ PREN11 PiController Java Edition is starting ++++++");
         out.println("Using args: " + Strings.join(",",args));
         CameraModule camera = Config.USE_CAMERA == Config.CAMERA_ID_USB ? new WebCameraModule() : new PiCameraModule();
@@ -51,18 +51,21 @@ public class Parcour implements Run{
                 throw ex; // throw so it cleans up run correctly
             }
             out.println("Setup complete, start movement");
-            //Speedometer.getInstance().increaseSpeed();
 
             Boolean end = false;
             //2. Start Run
             serverCommunicator.sendStart();
 
             while(end == false){
+                if(Config.USE_CAMERA == Config.CAMERA_ID_PI) Speedometer.getInstance().move();
                 var latestValue = detector.detectUniqueCode();
+                if(Config.USE_CAMERA == Config.CAMERA_ID_PI) Speedometer.getInstance().stop();
                 // process value
                 end = (latestValue.getText() != null && latestValue.getText().equals("end"));
-                out.println("For Debugging --> saving image locally");
-                Utils.saveImageLocally(latestValue.getImage(),"debug_"+currentTimeMillis()+".jpg");
+                if(Config.DEBUG_MODE){
+                    out.println("For Debugging --> saving image locally");
+                    Utils.saveImageLocally(latestValue.getImage(),"debug_"+currentTimeMillis()+".jpg");
+                }
 
                 if (end == false) {
                     //if its not the end it must be a plant

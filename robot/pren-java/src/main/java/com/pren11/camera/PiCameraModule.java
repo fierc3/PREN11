@@ -23,8 +23,8 @@ public class PiCameraModule implements CameraModule{
             ex.printStackTrace();
         }
         var config = CameraConfiguration.cameraConfiguration()
-                .width(1920)
-                .height(1080)
+                .width(Config.PICTURE_WIDTH)
+                .height(Config.PICTURE_HEIGHT)
                 .encoding(Encoding.JPEG)
                 .iso(Config.ISO)
                 .shutterSpeed(Config.SHUTTERSPEED)

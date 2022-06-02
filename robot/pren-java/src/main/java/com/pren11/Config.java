@@ -14,6 +14,12 @@ public class Config {
     public static int CAMERA_ID_USB = 1;
     public static int USE_CAMERA = CAMERA_ID_PI;
     public static boolean OFFLINE_MODE = true;
+    public static boolean DEBUG_MODE = true;
+    public static int PICTURE_WIDTH = 1920;
+    public static int PICTURE_HEIGHT = 1080;
+    public static int CROP_WIDTH_MULTIPLIER = 4;
+    public static int CROP_Y = 150;
+    public static int DETECT_X_BUFFER = 200;
 
     public static void updateByRelativeFile(){
         Properties prop = new Properties();
@@ -23,6 +29,10 @@ public class Config {
             ISO = Integer.parseInt(prop.getProperty("iso"));
             SHUTTERSPEED = Integer.parseInt(prop.getProperty("shutterspeed"));
             OFFLINE_MODE = prop.getProperty("offline").toString().equals("true");
+            OFFLINE_MODE = prop.getProperty("debug").toString().equals("true");
+            CROP_WIDTH_MULTIPLIER = Integer.parseInt(prop.getProperty("cropwidthmulti"));
+            CROP_Y = Integer.parseInt(prop.getProperty("cropy"));
+            DETECT_X_BUFFER = Integer.parseInt(prop.getProperty("xbuffer"));
         } catch (Exception ex) {
          System.err.println(("Failed to load config " + ex));
          ex.printStackTrace();

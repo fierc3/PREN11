@@ -98,6 +98,12 @@
             <artifactId>pi4j-core</artifactId>
             <version>2.1.1</version>
         </dependency>
+        <dependency>
+            <groupId>com.pi4j</groupId>
+            <artifactId>pi4j-plugin-raspberrypi</artifactId>
+            <version>2.1.1</version>
+        </dependency>
+
         <!-- https://mvnrepository.com/artifact/com.github.sarxos/webcam-capture -->
         <dependency>
             <groupId>com.github.sarxos</groupId>

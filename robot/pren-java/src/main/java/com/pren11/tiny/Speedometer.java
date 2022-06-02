@@ -45,6 +45,9 @@ public class Speedometer {
         out23.low();
     }
 
+
+    /*
+
     public void increaseSpeed(){
         if(out14.isLow()){
             out14.high();
@@ -63,6 +66,14 @@ public class Speedometer {
         }else if(out14.isHigh()){
             out14.low();
         }
+    }*/
+
+    public void move() {
+        out14.high();
+    }
+
+    public void stop() {
+        out14.low();
     }
 
 }
