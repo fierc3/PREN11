@@ -78,6 +78,8 @@ public class Speedometer {
 
     public void printStates(){
         System.out.println("in4 isHigh: "+ in4.isHigh() + " - out14 isHigh: " +out14.isHigh());
+        System.out.println("in4 isOn: "+ in4.isOn() + " - out14 isOn: " +out14.isOn());
+        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
     }
 
     public boolean isStartBeingPressed (){
