@@ -1,7 +1,9 @@
 package com.pren11.detector;
 
+import boofcv.alg.fiducial.qrcode.QrCode;
 import boofcv.factory.fiducial.ConfigQrCode;
 import boofcv.factory.fiducial.FactoryFiducial;
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.GrayU8;
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.EncodeHintType;
@@ -45,6 +47,28 @@ public class QrCodeDetector {
         return null;
     }
 
+    private String tryReadCode(BufferedImage image){
+        try{
+            GrayU8 gray = ConvertBufferedImage.convertFrom(image, (GrayU8)null);
+            var config = new ConfigQrCode();
+            var detector = FactoryFiducial.qrcode(config, GrayU8.class);
+            detector.process(gray);
+
+            // Gets a list of all the qr codes it could successfully detect and decode
+            var detections = detector.getDetections();
+            if(detections.size()>0){
+                var msg = detections.get(0).message;;
+                System.out.println("Read QR: " + msg);
+                return msg;
+            }
+        }catch (Exception ex){
+            System.err.println(ex.getMessage());
+        }
+
+        System.out.println("Failed to read qr, returning null");
+        return null;
+    }
+
     public static float previousX = 0;
 
     public QrResult readQrCode(BufferedImage croppedImage, BufferedImage uncroppedImage){
@@ -80,6 +104,7 @@ public class QrCodeDetector {
                 var croppedPlant = crop(uncroppedImage,x+edge, width, Config.CROP_Y);
                 result.setImage(Utils.toByteArray(croppedPlant,"jpg"));
                 previousX = point.getX() + Config.DETECT_X_BUFFER; //add a buffer
+                result.setText(tryReadCode(croppedImage));
             }
         }catch (Exception ex){
             //System.err.println(ex.toString());

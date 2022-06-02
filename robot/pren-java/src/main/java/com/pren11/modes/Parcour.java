@@ -78,8 +78,6 @@ public class Parcour implements Run{
                     serverCommunicator.sendPlant(plantIdResult);
                     }
                 }
-
-
         }catch (Exception ex){
             err.println("Error occured during run: " + ex.getLocalizedMessage());
             ex.printStackTrace();
