@@ -31,6 +31,7 @@ const getCurrentRun = (callBack) => {
             callBack(rows[0].run)
             return rows[0].run;
         } else {
+            callBack(undefined)
             return undefined;
         }
     });
@@ -88,7 +89,8 @@ const insertPlant = async (plantData) => {
 
 const beginRun = async () => {
     console.log("Beginning Run---------")
-    getCurrentRun(markBeginRun);
+    const run = getCurrentRun(markBeginRun);
+    
 }
 
 const endRun = async () => {

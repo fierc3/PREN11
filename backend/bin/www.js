@@ -29,7 +29,7 @@ io.on("connection", (socket) => {
 
   socket.on("RobotInput", (msg) => {
     msg = JSON.parse(msg);
-    console.log(`Robot sent message ${msg}`);
+    console.log(`Robot sent message ${JSON.stringify(msg)}`);
     if (msg.event_type === 'START') {
       db.beginRun();
     } else if (msg.event_type === 'END') {

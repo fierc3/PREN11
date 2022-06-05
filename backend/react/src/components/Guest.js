@@ -5,7 +5,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Footer from './Footer';
 import NavigationBar from './NavigationBar';
-import { Box } from '@mui/system';
+import { Box, width } from '@mui/system';
 import { Alert, Grid, Snackbar, Typography } from '@mui/material';
 import RunEndCard from './cards/RunEndCard';
 import InProgressCard from './cards/InProgressCard';
@@ -13,6 +13,7 @@ import PlantCard from './cards/PlantCard';
 import { getMainSocket } from './MainSocketSingleton';
 import socketIOClient from "socket.io-client";
 import useCheckMobileScreen from './Utils';
+import TechnicalDetails from './TechnicalDetails';
 
 
 var ENDPOINT = config.url.API_URL;
@@ -44,6 +45,7 @@ const Guest = () => {
     const [toast, setToast] = React.useState(false)
     const [toastText, setToastText] = React.useState(false)
     const [progress, setProgress] =  React.useState(0);
+    const [openDetails, setOpenDetails] = React.useState(false);
 
     const updateMetaData = (event) => {
         setRun(event.run);
@@ -62,6 +64,7 @@ const Guest = () => {
     const connect = () => {
         let socket = socketIOClient(ENDPOINT, { transports: ['websocket'], secure: true });
         socket.on("RobotOutput", roboMessage => {
+            
             let json = JSON.parse(roboMessage);
             setData(arr => [...arr, json]);
             if (data.length < 1 || json.run !== data[0].run) {
@@ -86,14 +89,19 @@ const Guest = () => {
 
 
     const updateData = async () => {
-        const response = await fetch(ENDPOINT + "/api/currentRun");
-        const json = await response.json();
-        setData(json);
-        console.log(json)
-        updateProgress(json)
-        if (json.length > 0) {
-            updateMetaData(json[0])
+        try {
+            const response = await fetch(ENDPOINT + "/api/currentRun");
+            const json = await response.json();
+            setData(json);
+            console.log(json)
+            updateProgress(json)
+            if (json.length > 0) {
+                updateMetaData(json[0])
+            }
+        }catch (ex){
+            console.log("nodata")
         }
+
 
     }
 
@@ -124,8 +132,11 @@ const Guest = () => {
                         <Typography gutterBottom variant="caption" component="span" position={"absolute"} paddingLeft={"30px"} paddingTop={"75px"}>
                             {startDate}
                         </Typography>
-                        <Box sx={{ width: "90vw", marginTop: "27vh", marginLeft: "50px" }}>
-                            <Grid container spacing={6} alignContent="center"direction={useCheckMobileScreen() ? "column": undefined} >
+                        <Typography gutterBottom variant="caption" component="span" position={"absolute"} paddingLeft={"30px"} paddingTop={"100px"}>
+                            This is the offical website for PREN by group 11. Click <a style={{textDecoration:'underline', cursor:'pointer'}} onClick={() => setOpenDetails(true)}>here</a> for detailed technical view!
+                        </Typography>
+                        <Box sx={{marginTop: "27vh", marginLeft: "50px"}}>
+                            <Grid container spacing={6} alignContent="center"direction={useCheckMobileScreen() ? "column": undefined} style={{width:"100%",  paddingBottom:'100px'}} >
                                 
                                 {data.filter(event => event.event_type !== 1).map((event, index) => {
                                     const plant = JSON.parse(event.event_value);
@@ -133,13 +144,13 @@ const Guest = () => {
                                         //first plant found, so needs to be the one at the start
                                         firstPlantName = plant.plantName;
                                         return (<Grid item key={event.event_id}>
-                                            <PlantCard name={plant.plantName} text={"Found at start"} />
+                                            <PlantCard name={plant.plantName} image={plant.image} text={"Found at start"} />
                                         </Grid>)
                                     }
                                     if (index > 0 && event.event_type === 2) {
                                         return (
                                             <Grid item key={event.event_id}>
-                                                <PlantCard name={plant.plantName} text={"Found at Position " + index} found={firstPlantName === plant.plantName} />
+                                                <PlantCard name={plant.plantName}  image={plant.image} text={"Found at Position " + index} found={firstPlantName === plant.plantName} />
                                             </Grid>
                                         )
                                     } else if (event.event_type === 3) {
@@ -166,7 +177,8 @@ const Guest = () => {
                 >
                     <Alert severity="success">{toastText}</Alert>
                 </Snackbar>
-                <Footer progress={progress.toFixed(2)} />
+                <Footer progress={parseFloat(progress.toFixed(2))} />
+                <TechnicalDetails events={data} open={openDetails} handleClose={() => setOpenDetails(false)} ></TechnicalDetails>
             </ThemeProvider>
         </>
     );

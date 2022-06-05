@@ -4,8 +4,9 @@ import useCheckMobileScreen from "../Utils";
 
 const PlantCard = (props) => {
     const getPlantImage = () => {
-        if (props.url) {
-            return props.url;
+        if (props.image) {
+            console.log(props.image)
+            return props.image.url;
         }
         return props.found === true ? "/found.jpg" : "/plantlogo.jpg";
     }

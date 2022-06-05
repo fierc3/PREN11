@@ -31,9 +31,9 @@ const Management = () => {
     socket.emit('RobotInput', JSON.stringify({event_type:"END"}));
   }
 
-  const sendPlant = (name) => {
+  const sendPlant = (name, url) => {
     let socket = getMainSocket(ENDPOINT);
-    socket.emit('RobotInput', JSON.stringify({event_type:"PLANT", event_value:{plantName:name}}));
+    socket.emit('RobotInput', JSON.stringify({event_type:"PLANT", event_value:{plantName:name,image:{url}}}));
   }
 
 
@@ -158,7 +158,7 @@ const Management = () => {
       description: 'Send plant',
       fn: (...args) => {
         return new Promise((resolve, reject) => {
-            sendPlant(args[0])
+            sendPlant(args[0], args[1])
             resolve("Done");
         })
       }
