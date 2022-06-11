@@ -1,6 +1,7 @@
 package com.pren11;
 
 import com.pren11.modes.Parcour;
+import com.pren11.modes.PinTester;
 import com.pren11.modes.Run;
 import com.pren11.tiny.Speedometer;
 
@@ -12,6 +13,7 @@ public class Program {
 
 
     public static void main(String[] args) throws Exception {
+
         if(Config.USE_CAMERA == Config.CAMERA_ID_PI){
             System.setOut(new PrintStream(new FileOutputStream("pren11-out.txt")));
             System.setErr(new PrintStream(new FileOutputStream("pren11-err.txt")));
@@ -30,5 +32,7 @@ public class Program {
         Run mode = new Parcour();
         mode.run(args);
     }
+
+
 
 }

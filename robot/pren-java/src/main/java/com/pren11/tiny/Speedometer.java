@@ -1,10 +1,7 @@
 package com.pren11.tiny;
 
-import com.pi4j.Pi4J;
-import com.pi4j.io.gpio.Gpio;
-import com.pi4j.io.gpio.digital.DigitalInput;
-import com.pi4j.io.gpio.digital.DigitalOutput;
-import com.pi4j.io.gpio.digital.DigitalState;
+
+import com.pi4j.io.gpio.*;
 
 public class Speedometer {
 
@@ -13,23 +10,24 @@ public class Speedometer {
     int outPin23 = 23;
     int inPin24 = 24;
     int startPin4 = 4;
-
-    DigitalOutput out14;
-    DigitalOutput out15;
-    DigitalOutput out23;
-    DigitalInput in24;
-    DigitalInput in4;
-
+    int startPin7 = 7;
+    GpioPinDigitalInput startInput = null;
+    GpioPinDigitalOutput moveOutput = null;
 
     static Speedometer instance = null;
 
     private Speedometer(){
-        var pi4j = Pi4J.newAutoContext();
-        out14 = pi4j.dout().create(outPin14);
-        out15 = pi4j.dout().create(outPin15);
-        out23 = pi4j.dout().create(outPin23);
-        in24 = pi4j.din().create(inPin24);
-        in4 = pi4j.din().create(startPin4);
+        System.out.println("<--Pi4J--> GPIO Control Example ... started.");
+
+        // create gpio controller
+        final GpioController gpio = GpioFactory.getInstance();
+
+        // provision gpio pin #01 as an output pin and turn on
+        moveOutput = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_15, "move", PinState.LOW);
+        startInput = gpio.provisionDigitalInputPin(RaspiPin.GPIO_07, "start");
+
+        // set shutdown state for this pin
+        moveOutput.setShutdownOptions(true, PinState.LOW);
     }
 
     public static Speedometer getInstance(){
@@ -40,51 +38,25 @@ public class Speedometer {
     }
 
     public void fullStop(){
-        out14.low();
-        out15.low();
-        out23.low();
+    moveOutput.low();
     }
 
-
-    /*
-
-    public void increaseSpeed(){
-        if(out14.isLow()){
-            out14.high();
-        }else if(out15.isLow()){
-            out15.high();
-        }else if(out23.isLow()){
-            out23.high();
-        }
-    }
-
-    public void decreaseSpeed(){
-        if(out23.isLow()){
-            out23.low();
-        }else if(out15.isHigh()){
-            out15.low();
-        }else if(out14.isHigh()){
-            out14.low();
-        }
-    }*/
 
     public void move() {
-        out14.high();
+        moveOutput.high();
     }
 
     public void stop() {
-        out14.low();
+        moveOutput.low();
     }
 
     public void printStates(){
-        System.out.println("in4 isHigh: "+ in4.isHigh() + " - out14 isHigh: " +out14.isHigh());
-        System.out.println("in4 isOn: "+ in4.isOn() + " - out14 isOn: " +out14.isOn());
-        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        System.out.println("in4 isHigh: "+ startInput.isHigh());
     }
 
     public boolean isStartBeingPressed (){
-        System.out.println(in4.isOn());
-        return in4.isHigh();
+        printStates();
+        return startInput.isHigh();
     }
 
 }
