@@ -48,18 +48,8 @@
         </dependency>
         <dependency>
             <groupId>org.boofcv</groupId>
-            <artifactId>boofcv-feature</artifactId>
-            <version>0.40.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.boofcv</groupId>
             <artifactId>boofcv-swing</artifactId>
             <version>0.27</version>
-        </dependency>
-        <dependency>
-            <groupId>org.boofcv</groupId>
-            <artifactId>boofcv-io</artifactId>
-            <version>0.40.1</version>
         </dependency>
         <dependency>
             <groupId>org.boofcv</groupId>
@@ -154,50 +144,6 @@
                         </manifest>
                     </archive>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>11</source>
-                    <target>11</target>
-                    <compilerArgument>-Xlint:all,-processing</compilerArgument>
-                    <showDeprecation>true</showDeprecation>
-                    <showWarnings>true</showWarnings>
-                    <useIncrementalCompilation>false</useIncrementalCompilation>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <show>package</show>
-                    <attach>true</attach>
-                    <additionalJOption>-html5</additionalJOption>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <configuration>
-                    <attach>true</attach>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
 
 
