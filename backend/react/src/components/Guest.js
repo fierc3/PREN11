@@ -46,11 +46,36 @@ const Guest = () => {
     const [toastText, setToastText] = React.useState(false)
     const [progress, setProgress] =  React.useState(0);
     const [openDetails, setOpenDetails] = React.useState(false);
+    const [elapsedTime, setElapsedTime] = React.useState(new Date())
+    const [durationPrint, setDurationPrint] = React.useState("")
+
+    React.useEffect(() => {
+        if(!data) return
+        const end = data?.find(e => e.event_type === 3)
+        const start = data[0]
+        if(!start) return;
+        console.log("start",start)
+        console.log("end",end)
+        let dateToPrint = elapsedTime;
+        if(end){
+            dateToPrint = new Date(new Date(end.datetime).getTime()-new Date(start.datetime).getTime());
+        }
+        setDurationPrint(dateToPrint.getMinutes() + "M:" + dateToPrint.getSeconds()+"S")
+    },[elapsedTime])
+
+    let timerInterval = undefined;
 
     const updateMetaData = (event) => {
         setRun(event.run);
-        let date = new Date(event.datetime).toLocaleString();
-        setStartDate("Run started at " + date);
+        let date = new Date(event.datetime)
+        setStartDate("Run started at " + date.toLocaleString());
+        clearInterval(timerInterval)
+        timerInterval = setInterval(() => {
+            console.log(data.filter(e => e.event_type === 3).length)
+            const duration = new Date(new Date().getTime() - date.getTime());
+            console.log("duration", duration)
+            setElapsedTime(duration)
+        }, 1000)
     }
 
     const updateProgress=(events)=>{
@@ -121,10 +146,10 @@ const Guest = () => {
 
     return (
         <>
-            <ThemeProvider theme={theme}>
+            <ThemeProvider theme={theme} >
                 <CssBaseline />
                 <NavigationBar />
-                <main>
+                <main style={{display:'inline'}}>
                     <Box sx={{ pt: "10vh", backgroundColor: "", height: "90vh" }}>
                         <Typography gutterBottom variant="h5" component="span" position={"absolute"} paddingLeft={"30px"} paddingTop={"50px"}>
                             Run {run}
@@ -135,14 +160,17 @@ const Guest = () => {
                         <Typography gutterBottom variant="caption" component="span" position={"absolute"} paddingLeft={"30px"} paddingTop={"100px"}>
                             This is the offical website for PREN by group 11. Click <a style={{textDecoration:'underline', cursor:'pointer'}} onClick={() => setOpenDetails(true)}>here</a> for detailed technical view!
                         </Typography>
-                        <Box sx={{marginTop: "27vh", marginLeft: "50px"}}>
+                        <Box sx={{marginTop: "27vh", marginLeft: "50px", paddingBottom:"100px"}}>
                             <Grid container spacing={6} alignContent="center"direction={useCheckMobileScreen() ? "column": undefined} style={{width:"100%",  paddingBottom:'100px'}} >
                                 
                                 {data.filter(event => event.event_type !== 1).map((event, index) => {
                                     const plant = JSON.parse(event.event_value);
-                                    if (index === 0) {
+
+                                    console.log("plant", plant)
+                                    if (index === 0 && plant) {
                                         //first plant found, so needs to be the one at the start
                                         firstPlantName = plant.plantName;
+                                        if(firstPlantName)
                                         return (<Grid item key={event.event_id}>
                                             <PlantCard name={plant.plantName} image={plant.image} text={"Found at start"} />
                                         </Grid>)
@@ -167,6 +195,7 @@ const Guest = () => {
                             </Grid>
                         </Box>
                     </Box>
+                    
                 </main>
                 <Snackbar
                     anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
@@ -177,7 +206,7 @@ const Guest = () => {
                 >
                     <Alert severity="success">{toastText}</Alert>
                 </Snackbar>
-                <Footer progress={parseFloat(progress.toFixed(2))} />
+                <Footer  progress={parseFloat(progress.toFixed(2))} runDuration={durationPrint} />
                 <TechnicalDetails events={data} open={openDetails} handleClose={() => setOpenDetails(false)} ></TechnicalDetails>
             </ThemeProvider>
         </>

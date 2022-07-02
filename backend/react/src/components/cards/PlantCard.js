@@ -4,7 +4,8 @@ import useCheckMobileScreen from "../Utils";
 
 const PlantCard = (props) => {
     const getPlantImage = () => {
-        if (props.image) {
+        if (props.image && props.image.length > 0) {
+            console.log("using custom image:",props.image)
             console.log(props.image)
             return props.image.url;
         }

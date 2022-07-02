@@ -5,10 +5,10 @@ import LinearProgress from '@mui/material/LinearProgress';
 const Footer = (props) => {
     return (<>
         {/* Footer */}
-        <Box sx={{ position: "fixed", bottom: 0, height: "15vh", width: "100vw", borderTop: 1, borderColor: '#d2d2d9', backgroundColor: "white" }} component="footer">
+        <Box sx={{ position: "fixed", bottom: 0, height: "20vh", maxHeight:'120px', width: "100vw", borderTop: 1, borderColor: '#d2d2d9', backgroundColor: "white" }} component="footer">
             <Typography sx={{ pt: "10px" }} fontWeight="light" variant="h4" align="center" gutterBottom>
                 <span className="largeTitle">ESTIMATE</span> <Typography variant="span" color="green">
-                    PROGRESS: {props.progress}%
+                    PROGRESS: {props.progress}% ({props.runDuration})
                 </Typography>
             </Typography>
             <Grid container justifyContent="center">
