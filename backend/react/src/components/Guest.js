@@ -54,8 +54,6 @@ const Guest = () => {
         const end = data?.find(e => e.event_type === 3)
         const start = data[0]
         if(!start) return;
-        console.log("start",start)
-        console.log("end",end)
         let dateToPrint = elapsedTime;
         if(end){
             dateToPrint = new Date(new Date(end.datetime).getTime()-new Date(start.datetime).getTime());
@@ -71,9 +69,7 @@ const Guest = () => {
         setStartDate("Run started at " + date.toLocaleString());
         clearInterval(timerInterval)
         timerInterval = setInterval(() => {
-            console.log(data.filter(e => e.event_type === 3).length)
             const duration = new Date(new Date().getTime() - date.getTime());
-            console.log("duration", duration)
             setElapsedTime(duration)
         }, 1000)
     }
@@ -118,7 +114,6 @@ const Guest = () => {
             const response = await fetch(ENDPOINT + "/api/currentRun");
             const json = await response.json();
             setData(json);
-            console.log(json)
             updateProgress(json)
             if (json.length > 0) {
                 updateMetaData(json[0])
@@ -166,7 +161,6 @@ const Guest = () => {
                                 {data.filter(event => event.event_type !== 1).map((event, index) => {
                                     const plant = JSON.parse(event.event_value);
 
-                                    console.log("plant", plant)
                                     if (index === 0 && plant) {
                                         //first plant found, so needs to be the one at the start
                                         firstPlantName = plant.plantName;
