@@ -10,6 +10,7 @@ import com.pren11.server.PlantIdApiHandler;
 import com.pren11.server.ServerCommunicator;
 import com.pren11.tiny.Speedometer;
 
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import static java.lang.System.*;
@@ -61,7 +62,10 @@ public class Parcour implements Run{
                 var latestValue = detector.detectUniqueCode();
                 if(Config.USE_CAMERA == Config.CAMERA_ID_PI) Speedometer.getInstance().stop();
                 // process value
-                end = (latestValue.getText() != null && latestValue.getText().equals("end"));
+                end = (latestValue.getText() != null && (
+                        latestValue.getText().toLowerCase().contains("end")
+                                || latestValue.getText().toLowerCase().contains("ziel")
+                        ));
                 if(Config.DEBUG_MODE){
                     out.println("For Debugging --> saving image locally");
                     Utils.saveImageLocally(latestValue.getImage(),"debug_"+currentTimeMillis()+".jpg");
@@ -83,6 +87,7 @@ public class Parcour implements Run{
             ex.printStackTrace();
         }finally{
             out.println("Ending run!");
+            Speedometer.getInstance().fullStop();
             if (detector != null)
             {
                 detector.release();
