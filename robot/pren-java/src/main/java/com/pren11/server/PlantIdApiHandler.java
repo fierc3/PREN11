@@ -43,7 +43,8 @@ public class PlantIdApiHandler {
 
     public static String sendToPlantId(byte[] array) throws Exception {
         if(Config.OFFLINE_MODE) return null;
-        String apiKey = "LYsccirRB9jadHsq8e2j7ddsDOLihh0LiITrGgkKDtu0oa8uLC";
+        String apiKey = Config.API_PLANTID;
+
 
         // read image from local file system and encode
         String [] flowers = new String[] {"cropped_bad.jpg"};

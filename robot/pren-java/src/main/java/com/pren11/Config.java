@@ -5,6 +5,7 @@ import java.util.Properties;
 
 public class Config {
     public static String URL_PLANTID = "https://api.plant.id/v2/identify";
+    public static String API_PLANTID = "-";
     public static String URL_SERVERSOCKET = "https://tactile-rigging-333212.oa.r.appspot.com";
     public static int SHUTTERSPEED = 20000;
     public static int ISO = 100;
@@ -31,6 +32,7 @@ public class Config {
             CROP_WIDTH_MULTIPLIER = Integer.parseInt(prop.getProperty("cropwidthmulti"));
             CROP_Y = Integer.parseInt(prop.getProperty("cropy"));
             DETECT_X_BUFFER = Integer.parseInt(prop.getProperty("xbuffer"));
+            API_PLANTID = prop.getProperty("plantid");
         } catch (Exception ex) {
          System.err.println(("Failed to load config " + ex));
          ex.printStackTrace();
