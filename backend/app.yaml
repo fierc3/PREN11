@@ -14,7 +14,9 @@
 runtime: nodejs
 env: flex
 network:
-  session_affinity: true
+  session_affinity: false
+manual_scaling:
+  instances: 1
 
 # [START gae_analytics_env_variables]
 env_variables:

@@ -33,7 +33,7 @@ const Management = () => {
 
   const sendPlant = (name, url) => {
     let socket = getMainSocket(ENDPOINT);
-    socket.emit('RobotInput', JSON.stringify({event_type:"PLANT", event_value:{plantName:name,image:{url}}}));
+    socket.emit('RobotInput', JSON.stringify({event_type:"PLANT", event_value:{plantName:name,image:url}}));
   }
 
 

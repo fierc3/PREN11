@@ -7,7 +7,7 @@ const PlantCard = (props) => {
         if (props.image && props.image.length > 0) {
             console.log("using custom image:",props.image)
             console.log(props.image)
-            return props.image.url;
+            return props.image;
         }
         return props.found === true ? "/found.jpg" : "/plantlogo.jpg";
     }
