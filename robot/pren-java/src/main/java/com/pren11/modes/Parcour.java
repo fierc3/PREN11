@@ -24,7 +24,6 @@ public class Parcour implements Run{
         out.println("Using args: " + Strings.join(",",args));
         CameraModule camera = Config.USE_CAMERA == Config.CAMERA_ID_USB ? new WebCameraModule() : new PiCameraModule();
 
-
         var runUuid = java.util.UUID.randomUUID();
         out.println("Loaded args, setting up run: " + runUuid.toString());
         QrCodeDetector detector = null;
@@ -57,37 +56,50 @@ public class Parcour implements Run{
             //2. Start Run
             serverCommunicator.sendStart();
 
-            while(end == false){
-                if(Config.USE_CAMERA == Config.CAMERA_ID_PI) Speedometer.getInstance().move();
+            while(end == false) {
+                if (Config.USE_CAMERA == Config.CAMERA_ID_PI) Speedometer.getInstance().move();
                 var latestValue = detector.detectUniqueCode();
-                if(Config.USE_CAMERA == Config.CAMERA_ID_PI) Speedometer.getInstance().stop();
+                if (Config.USE_CAMERA == Config.CAMERA_ID_PI) Speedometer.getInstance().stop();
                 // process value
+                out.println("latestValue: " + latestValue.getText());
                 end = (latestValue.getText() != null && (
                         latestValue.getText().toLowerCase().contains("end")
                                 || latestValue.getText().toLowerCase().contains("ziel")
-                        ));
-                if(Config.DEBUG_MODE){
-                    out.println("For Debugging --> saving image locally");
-                    Utils.saveImageLocally(latestValue.getImage(),"debug_"+currentTimeMillis()+".jpg");
-                }
-
+                                || latestValue.getText().toLowerCase().contains("stop")
+                ));
                 if (end == false) {
-                    //if its not the end it must be a plant
-                    //send to plantId
-                    out.println("Preparing to send image to plantId, offlineMode: " +Config.OFFLINE_MODE);
-                    var imageBytes = latestValue.getImage();
-                    var plantIdResult = PlantIdApiHandler.sendToPlantId(imageBytes);
-                    // Send Result to Webserver via socket.io
-                    out.println("Sending found plant via socket: " + plantIdResult);
-                    serverCommunicator.sendPlant(plantIdResult);
-                    }
+                    ServerCommunicator finalServerCommunicator = serverCommunicator;
+                    new Thread(() -> {
+                        try {
+                            //if its not the end it must be a plant
+                            //send to plantId
+                            out.println("Preparing to send image to plantId, offlineMode: " + Config.OFFLINE_MODE);
+                            var imageBytes = latestValue.getImage();
+                            var plantIdResult = PlantIdApiHandler.sendToPlantId(imageBytes);
+                            // Send Result to Webserver via socket.io
+                            if (plantIdResult.getProbability() > Config.MIN_PROB) {
+                                out.println("Plant has required min P of "+Config.MIN_PROB+": " + plantIdResult.getProbability());
+                                out.println("Sending found plant via socket: " + plantIdResult);
+                                finalServerCommunicator.sendPlant(plantIdResult.getPlantName(), plantIdResult.getImageUrl());
+                            }
+
+                        } catch (Exception ex) {
+                            err.println("Error occured during run: " + ex.getLocalizedMessage());
+                            ex.printStackTrace();
+                        }
+                        if (Config.DEBUG_MODE) {
+                            out.println("For Debugging --> saving image locally");
+                            Utils.saveImageLocally(latestValue.getImage(), "debug_" + currentTimeMillis() + ".jpg");
+                        }
+                    }).run();
                 }
+            }
         }catch (Exception ex){
             err.println("Error occured during run: " + ex.getLocalizedMessage());
             ex.printStackTrace();
         }finally{
             out.println("Ending run!");
-            Speedometer.getInstance().fullStop();
+            if(Config.USE_CAMERA == Config.CAMERA_ID_PI)Speedometer.getInstance().fullStop();
             if (detector != null)
             {
                 detector.release();
@@ -95,6 +107,7 @@ public class Parcour implements Run{
             if (serverCommunicator != null)
             {
                 serverCommunicator.sendEnd();
+                serverCommunicator.disconnect();
             }
         }
     }

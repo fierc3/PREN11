@@ -1,5 +1,6 @@
 package com.pren11.modes;
 
+import com.pren11.camera.CameraModule;
 import com.pren11.detector.QrCodeDetector;
 
 import javax.imageio.ImageIO;

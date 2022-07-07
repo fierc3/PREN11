@@ -99,9 +99,10 @@ public class QrCodeDetector {
 
                 var edge = uncroppedImage.getWidth() / 100 * 25;
                 var x = (int)point.getX()/100*70;
+                var y = uncroppedImage.getHeight();
                 //var y = (int)point.getY(); set height manual since we dont know where the plant is
                 var width = (int)(point.getX()/100*30)*Config.CROP_WIDTH_MULTIPLIER;
-                var croppedPlant = crop(uncroppedImage,x+edge, width, Config.CROP_Y);
+                var croppedPlant = crop(uncroppedImage,x+edge, width, y);
                 result.setImage(Utils.toByteArray(croppedPlant,"jpg"));
                 previousX = point.getX() + Config.DETECT_X_BUFFER; //add a buffer
                 result.setText(tryReadCode(croppedImage));

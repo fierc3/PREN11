@@ -7,6 +7,7 @@ public class Config {
     public static String URL_PLANTID = "https://api.plant.id/v2/identify";
     public static String API_PLANTID = "-";
     public static String URL_SERVERSOCKET = "https://tactile-rigging-333212.oa.r.appspot.com";
+    //public static String URL_SERVERSOCKET = "http://192.168.0.17:3001/";
     public static int SHUTTERSPEED = 20000;
     public static int ISO = 100;
     public static int CAMERA_ID_PI = 0;
@@ -19,6 +20,8 @@ public class Config {
     public static int CROP_WIDTH_MULTIPLIER = 4;
     public static int CROP_Y = 150;
     public static int DETECT_X_BUFFER = 200;
+    public static double MIN_PROB = 0.01;
+    public static boolean SENDTOPLANTID = false;
 
     public static void updateByRelativeFile(){
         Properties prop = new Properties();
@@ -33,6 +36,8 @@ public class Config {
             CROP_Y = Integer.parseInt(prop.getProperty("cropy"));
             DETECT_X_BUFFER = Integer.parseInt(prop.getProperty("xbuffer"));
             API_PLANTID = prop.getProperty("plantid");
+            SENDTOPLANTID = prop.getProperty("sendtoplantid").equals("true");
+            MIN_PROB = Integer.parseInt(prop.getProperty("minprob"));
         } catch (Exception ex) {
          System.err.println(("Failed to load config " + ex));
          ex.printStackTrace();

@@ -35,30 +35,27 @@ public class PlantIdApiHandler {
         InputStream is = con.getInputStream();
         String response = new String(is.readAllBytes());
 
-        System.out.println("Response code : " + con.getResponseCode());
-        System.out.println("Response : " + response);
+//        System.out.println("Response code : " + con.getResponseCode());
+//        System.out.println("Response : " + response);
         con.disconnect();
         return response;
     }
 
-    public static String sendToPlantId(byte[] array) throws Exception {
-        if(Config.OFFLINE_MODE) return null;
+    public static PlantIdResult sendToPlantId(byte[] array) throws Exception {
+        var result = new PlantIdResult("Unknown","",100);
+        if(Config.OFFLINE_MODE) return result;
+        if(!Config.SENDTOPLANTID){
+            System.out.println("NOT SENDING to plantid, returning mock value");
+            return result;
+        }
         String apiKey = Config.API_PLANTID;
-
-
-        // read image from local file system and encode
-        String [] flowers = new String[] {"cropped_bad.jpg"};
 
 
         JSONObject data = new JSONObject();
         data.put("api_key", apiKey);
-
-        // add images
+        String fileData = base64EncodeFromBytes(array);
         JSONArray images = new JSONArray();
-        for(String filename : flowers) {
-            String fileData = base64EncodeFromBytes(array);
-            images.put(fileData);
-        }
+        images.put(fileData);
         data.put("images", images);
 
         // add modifiers
@@ -83,6 +80,7 @@ public class PlantIdApiHandler {
         data.put("plant_details", plantDetails);
 
         var res = sendPostRequest(Config.URL_PLANTID, data);
+        //System.out.println("PlantId Result: \n" + res);
         JSONObject jsonObject = new JSONObject(res.trim());
         Iterator<String> keys = jsonObject.keys();
 
@@ -103,12 +101,27 @@ public class PlantIdApiHandler {
                     }catch (Exception ex){
                         System.out.println("Failed to get common names, ex: " + ex.getLocalizedMessage());
                     }
-
                     System.out.println("PlantId Returned: " + plantName);
-                    return plantName;
+                    result.setPlantName(plantName);
+
+                    try{
+                        var similarImages = firstSuggestion.getJSONArray("similar_images");
+                        if(similarImages.length() > 0){
+                            result.setImageUrl(((JSONObject)similarImages.get(0)).getString("url"));
+                        }
+                    }catch (Exception ex){
+                        System.err.println("failed to get image for plant: "+ ex.getLocalizedMessage());
+                    }
+
+                    try{
+                        var p = firstSuggestion.getDouble("probability");
+                        result.setProbability(p);
+                    }catch (Exception ex){
+                        System.err.println("failed to get probability for plant: "+ ex.getLocalizedMessage());
+                    }
                 }
             }
         }
-        return "Plant";
+        return result;
     }
 }
